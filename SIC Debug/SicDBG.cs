@@ -16,18 +16,100 @@ namespace SIC_Debug
     {
         byte[] memory;
         int registerA;
+
+        public int RegisterA
+        {
+            get { return registerA; }
+            set { 
+                registerA = value;
+                tbRegA.Text = registerA.ToString("X6");
+            }
+        }
         int registerB;
+
+        public int RegisterB
+        {
+            get { return registerB; }
+            set
+            {
+                registerB = value;
+                tbRegB.Text = registerB.ToString("X6");
+            }
+        }
         int registerX;
+
+        public int RegisterX
+        {
+            get { return registerX; }
+            set
+            {
+                registerX = value;
+                tbRegX.Text = registerX.ToString("X6");
+            }
+        }
         int registerL;
+
+        public int RegisterL
+        {
+            get { return registerL; }
+            set
+            {
+                registerL = value;
+                tbRegL.Text = registerL.ToString("X6");
+            }
+        }
         int registerS;
+
+        public int RegisterS
+        {
+            get { return registerS; }
+            set
+            {
+                registerS = value;
+                tbRegS.Text = registerS.ToString("X6");
+            }
+        }
         int registerT;
-        int ProgramCounter;
-        int StatusWord;
+
+        public int RegisterT
+        {
+            get { return registerT; }
+            set
+            {
+                registerT = value;
+                tbRegT.Text = registerT.ToString("X6");
+            }
+        }
+        int programCounter;
+
+        public int ProgramCounter
+        {
+            get { return programCounter; }
+            set
+            {
+                programCounter = value;
+                tbPC.Text = programCounter.ToString("X6");
+            }
+        }
+        int statusWord;
+
+        public int StatusWord
+        {
+            get { return statusWord; }
+            set
+            {
+                statusWord = value;
+                tbSW.Text = statusWord.ToString("X6");
+            }
+        }
         List<int> breakpoints;
         Device[] devices;
         Queue<Instruction> lastInst;
         Queue<String> errors;
         bool devicewrite;
+
+        static List<char> HexChars = new List<char>(new char[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f', 'A', 'B', 'C', 'D', 'E', 'F', '\b' });
+
         public SicDBG()
         {
             memory = Enumerable.Repeat<byte>(0xFF, 32768).ToArray<byte>();
@@ -153,10 +235,6 @@ namespace SIC_Debug
                 outstr.AppendFormat("Note: Allow write not checked, but WD encountered. Output file not written to.{0}", Environment.NewLine);
                 newlines++;
             }
-            outstr.AppendFormat("Registers:{3}A: {0:X6} B: {1:X6} X: {2:X6}{3}",
-                registerA, registerB, registerX, System.Environment.NewLine);
-            outstr.AppendFormat("L: {0:X6} S: {1:X6} T: {2:X6}{3}{3}", registerL, registerS, registerT,
-                System.Environment.NewLine);
             outstr.AppendFormat("{0,6}   0 1 2 3  4 5 6 7  8 9 A B  C D E F{1}", "Addr", Environment.NewLine);
             for (int i = start; i <= end; i++)
             {
@@ -195,17 +273,17 @@ namespace SIC_Debug
             switch (reg)
             {
                 case Register.A:
-                    return registerA;
+                    return RegisterA;
                 case Register.B:
-                    return registerB;
+                    return RegisterB;
                 case Register.L:
-                    return registerL;
+                    return RegisterL;
                 case Register.S:
-                    return registerS;
+                    return RegisterS;
                 case Register.T:
-                    return registerT;
+                    return RegisterT;
                 case Register.X:
-                    return registerX;
+                    return RegisterX;
             }
             return -1;
         }
@@ -236,22 +314,22 @@ namespace SIC_Debug
             switch (reg)
             {
                 case Register.A:
-                    registerA = value;
+                    RegisterA = value;
                     break;
                 case Register.B:
-                    registerB = value;
+                    RegisterB = value;
                     break;
                 case Register.L:
-                    registerL = value;
+                    RegisterL = value;
                     break;
                 case Register.S:
-                    registerS = value;
+                    RegisterS = value;
                     break;
                 case Register.T:
-                    registerT = value;
+                    RegisterT = value;
                     break;
                 case Register.X:
-                    registerX = value;
+                    RegisterX = value;
                     break;
             }
         }
@@ -294,7 +372,7 @@ namespace SIC_Debug
         {
             int calcaddr;
             if (current.baserel)
-                calcaddr = registerB + current.address;
+                calcaddr = RegisterB + current.address;
             else if (current.extended)
                 calcaddr = current.address;
             else
@@ -307,7 +385,7 @@ namespace SIC_Debug
 
             if (current.indexed)
             {
-                calcaddr += registerX;
+                calcaddr += RegisterX;
             }
 
             return calcaddr;
@@ -323,7 +401,7 @@ namespace SIC_Debug
                 if (!current.pcrel)
                     memval = current.address;
                 else if (current.baserel)
-                    memval = registerB + current.address;
+                    memval = RegisterB + current.address;
                 else
                     memval = ProgramCounter + current.address;
             }
@@ -363,8 +441,8 @@ namespace SIC_Debug
                     SetRegisterValue(r2, (GetRegisterValue(r2) - GetRegisterValue(r1)));
                     break;
                 case OpCode.TIXR:
-                    registerX++;
-                    Comp(registerX, GetRegisterValue(r1));
+                    RegisterX++;
+                    Comp(RegisterX, GetRegisterValue(r1));
                     break;
                 case OpCode.SHIFTL:
                     uint lshift = (uint)GetRegisterValue(r1);
@@ -440,19 +518,19 @@ namespace SIC_Debug
                 switch ((OpCode)current.opcode)
                 {
                     case OpCode.ADD:
-                        registerA += memval;
+                        RegisterA += memval;
                         break;
                     case OpCode.SUB:
-                        registerA -= memval;
+                        RegisterA -= memval;
                         break;
                     case OpCode.MUL:
-                        registerA *= memval;
+                        RegisterA *= memval;
                         break;
                     case OpCode.DIV:
-                        registerA /= memval;
+                        RegisterA /= memval;
                         break;
                     case OpCode.COMP:
-                        Comp(registerA, memval);
+                        Comp(RegisterA, memval);
                         break;
                     case OpCode.J:
                         ProgramCounter = calcaddr;
@@ -470,59 +548,59 @@ namespace SIC_Debug
                             ProgramCounter = calcaddr;
                         break;
                     case OpCode.STA:
-                        StoreInt(calcaddr, registerA);
+                        StoreInt(calcaddr, RegisterA);
                         break;
                     case OpCode.STB:
-                        StoreInt(calcaddr, registerB);
+                        StoreInt(calcaddr, RegisterB);
                         break;
                     case OpCode.STL:
-                        StoreInt(calcaddr, registerL);
+                        StoreInt(calcaddr, RegisterL);
                         break;
                     case OpCode.STS:
-                        StoreInt(calcaddr, registerS);
+                        StoreInt(calcaddr, RegisterS);
                         break;
                     case OpCode.STT:
-                        StoreInt(calcaddr, registerT);
+                        StoreInt(calcaddr, RegisterT);
                         break;
                     case OpCode.STX:
-                        StoreInt(calcaddr, registerX);
+                        StoreInt(calcaddr, RegisterX);
                         break;
                     case OpCode.LDB:
-                        registerB = memval;
+                        RegisterB = memval;
                         break;
                     case OpCode.LDX:
-                        registerX = memval;
+                        RegisterX = memval;
                         break;
                     case OpCode.LDA:
-                        registerA = memval;
+                        RegisterA = memval;
                         break;
                     case OpCode.LDL:
-                        registerL = memval;
+                        RegisterL = memval;
                         break;
                     case OpCode.LDS:
-                        registerS = memval;
+                        RegisterS = memval;
                         break;
                     case OpCode.LDT:
-                        registerT = memval;
+                        RegisterT = memval;
                         break;
                     case OpCode.TIX:
-                        registerX++;
-                        Comp(registerX, memval);
+                        RegisterX++;
+                        Comp(RegisterX, memval);
                         break;
                     case OpCode.JSUB:
-                        registerL = ProgramCounter;
+                        RegisterL = ProgramCounter;
                         ProgramCounter = calcaddr;
                         break;
                     case OpCode.RSUB:
-                        ProgramCounter = registerL;
+                        ProgramCounter = RegisterL;
                         break;
                     case OpCode.LDCH:
-                        byte[] regA = BitConverter.GetBytes(registerA);
+                        byte[] regA = BitConverter.GetBytes(RegisterA);
                             byte[] newVal = { memory[calcaddr], regA[1], regA[2], regA[3] };
-                            registerA = BitConverter.ToInt32(newVal, 0);
+                            RegisterA = BitConverter.ToInt32(newVal, 0);
                         break;
                     case OpCode.STCH:
-                        byte[] regiA = BitConverter.GetBytes(registerA);
+                        byte[] regiA = BitConverter.GetBytes(RegisterA);
                             memory[calcaddr] = regiA[0];
                         break;
                     case OpCode.RD:
@@ -536,10 +614,10 @@ namespace SIC_Debug
                         }
                         break;
                     case OpCode.AND:
-                        registerA = registerA & memval;
+                        RegisterA = RegisterA & memval;
                         break;
                     case OpCode.OR:
-                        registerA = registerA | memval;
+                        RegisterA = RegisterA | memval;
                         break;
                     default:
                         tbOutput.Text += System.Environment.NewLine;
@@ -571,7 +649,7 @@ namespace SIC_Debug
 
         public bool DoDevice(OpCode op, int memval)
         {
-            byte[] regA = BitConverter.GetBytes(registerA);
+            byte[] regA = BitConverter.GetBytes(RegisterA);
             byte deviceno = (byte)((memval & 0x00FF0000) >> 16);
             try
             {
@@ -579,7 +657,7 @@ namespace SIC_Debug
                 {
                     case OpCode.RD:
                         byte[] rdVal = { GetDevice(deviceno).Read(), regA[1], regA[2], regA[3] };
-                        registerA = BitConverter.ToInt32(rdVal, 0);
+                        RegisterA = BitConverter.ToInt32(rdVal, 0);
                         return true;
                     case OpCode.WD:
                         if (allowWritingToolStripMenuItem.Checked)
@@ -897,6 +975,14 @@ namespace SIC_Debug
                     errorMsgs += errors.Dequeue();
 
                 OutputMemdump(errorMsgs);
+            }
+        }
+
+        private void hexinput_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (!HexChars.Contains(e.KeyChar))
+            {
+                e.Handled = true;
             }
         }
     }
