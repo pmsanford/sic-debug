@@ -17,8 +17,8 @@ namespace SIC_Debug
                 throw new DeviceNotInitialized();
             if (failurecount == 0)
             {
-                failurecount = new Random().Next(1, 5);
-                return (byte)fs.ReadByte();
+                failurecount = new Random().Next(1, 5); // This exists so that the device is periodically not ready
+                return (byte)fs.ReadByte();             // Otherwise ready check code would never get hit
             }
             else
             {
