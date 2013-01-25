@@ -7,6 +7,12 @@ namespace SIC_Debug
 {
     public class Instruction
     {
+        // 3/4 byte instruction layout:
+        // Top 6 bits: opcode
+        // bottom two bits of 1st byte: indirect immediate
+        // if these two are unset, we're in simple addressing mode, and only the index bit below matters
+        // from top to bottom of first 4 bits of the next byte: index, base-relative, pc-relative, extended
+        // following 12 bits (3 byte instruction) or 20 bits (4 byte instruction): address or argument
         public byte[] instruction;
         public OpCode opcode;
         public bool indirect;
