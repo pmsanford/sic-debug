@@ -39,9 +39,8 @@ namespace SIC_Debug
                 baserel = (inputbytes[1] & 0x40) > 0 ? true : false;
                 pcrel = (inputbytes[1] & 0x20) > 0 ? true : false;
                 extended = (inputbytes[1] & 0x10) > 0 ? true : false;
-                if (!indirect && !immediate)
+                if (!indirect && !immediate) // Simple SIC instruction
                 {
-                    indexed = false;
                     baserel = false;
                     pcrel = false;
                     extended = false;
@@ -52,7 +51,7 @@ namespace SIC_Debug
                     byte[] addr = { inputbytes[3], inputbytes[2], top, 0x0 };
                     address = BitConverter.ToInt32(addr, 0);
                 }
-                else if ((inputbytes[1] & 0x08) > 0 && pcrel)
+                else if ((inputbytes[1] & 0x08) > 0 && pcrel) // A 1 in the top bit of the address means we're doing a negative PC Relative calculation
                 {
                     if (inputbytes[2] == 0x00)
                     {
@@ -64,16 +63,17 @@ namespace SIC_Debug
                     address = (inputbytes[1] & 0x0F) * 256 + inputbytes[2];
                     address *= -1;
                 }
-                else if (!immediate && !indirect)
+                else if (!immediate && !indirect) // Simple SIC (direct) addressing mode
                 {
                     address = (inputbytes[1] * 256) + inputbytes[2];
                 }
-                else
+                else // Standard addressing mode
                 {
                     address = (inputbytes[1] & 0x0F) * 256 + inputbytes[2];
                 }
             }
         }
+
         public override string ToString()
         {
             if (twobyte)
