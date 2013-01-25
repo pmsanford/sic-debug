@@ -53,11 +53,11 @@ namespace SIC_Debug
 
     public enum Register
     {
-        A = 0,
-        B = 3,
-        L = 2,
-        S = 4,
-        T = 5,
-        X = 1,
+        A = 0, // Accumulator
+        B = 3, // Base (for addressing)
+        L = 2, // Linkage (for subroutines)
+        S = 4, // General purpose
+        T = 5, // General purpose
+        X = 1, // Index (for addressing)
     }
 }
