@@ -14,7 +14,9 @@ namespace SIC_Debug
 {
     public partial class SicDBG : Form
     {
-        byte[] memory;
+
+        #region Registers
+
         int registerA;
 
         public int RegisterA
@@ -102,6 +104,10 @@ namespace SIC_Debug
                 tbSW.Text = statusWord.ToString("X6");
             }
         }
+
+        #endregion
+
+        byte[] memory;
         List<int> breakpoints;
         Device[] devices;
         Queue<Instruction> lastInst;
@@ -748,6 +754,8 @@ namespace SIC_Debug
             return true;
         }
 
+        #region Event Handlers
+
         private void btnBkPt_Click(object sender, EventArgs e)
         {
             try
@@ -984,6 +992,8 @@ namespace SIC_Debug
                 e.Handled = true;
             }
         }
+
+        #endregion
     }
 
     public class DeviceNotInitialized : Exception
