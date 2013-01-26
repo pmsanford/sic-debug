@@ -959,7 +959,7 @@ namespace SIC_Debug
                         byte[] membytes = { memory[modaddr + 2], memory[modaddr + 1], memory[modaddr], 0 };
                         uint memval = BitConverter.ToUInt32(membytes, 0);
                         if (((memval & mask) + (extab[symbol] & mask) > mask) && op == '+')
-                            ;// Overflow error
+                            errors.Enqueue(string.Format("Overflow in add instruction at address {0}.", modaddr));
                         if (op == '+')
                         {
                             memval += (uint)extab[symbol] & mask;
