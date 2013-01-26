@@ -404,7 +404,7 @@ namespace SIC_Debug
 
             if (current.immediate && !current.indirect)
             {
-                if (!current.pcrel)
+                if (!current.pcrel) // Immediate mode combined with an addressing mode gets you the address as data. See Beck, p61
                     memval = current.address;
                 else if (current.baserel)
                     memval = RegisterB + current.address;
@@ -514,7 +514,6 @@ namespace SIC_Debug
             catch (IndexOutOfRangeException)
             {
                 errors.Enqueue(string.Format("Error: Instruction at 0x{0:X3} references memory that's out of range (0x{1:X3}).", ProgramCounter, calcaddr));
-                //tbOutput.Text += string.Format("Error: Instruction at 0x{0:X3} references memory that's out of range (0x{1:X3}).", ProgramCounter, calcaddr);
                 tbRunAddr.Text = string.Format("{0:X}", ProgramCounter);
                 return false;
             }
@@ -640,7 +639,6 @@ namespace SIC_Debug
             catch (IndexOutOfRangeException)
             {
                 errors.Enqueue(string.Format("Error: Instruction at 0x{0:X3} references memory that's out of range (0x{1:X3}).", ProgramCounter - 3, calcaddr));
-                //tbOutput.Text += string.Format("Error: Instruction at 0x{0:X3} references memory that's out of range (0x{1:X3}).", ProgramCounter-3, calcaddr);
                 tbRunAddr.Text = string.Format("{0:X}", ProgramCounter);
                 return false;
             }
@@ -683,8 +681,6 @@ namespace SIC_Debug
             {
                 errors.Enqueue(string.Format("Device {0:X} not initialized. Use the menu option to open files.{1}",
                     deviceno, Environment.NewLine));
-                //tbOutput.Text += string.Format("Device {0:X} not initialized. Use the menu option to open files.{1}",
-                //    deviceno, Environment.NewLine);
                 tbRunAddr.Text = string.Format("{0:X}", ProgramCounter);
                 return false;
             }
@@ -692,8 +688,6 @@ namespace SIC_Debug
             {
                 errors.Enqueue(string.Format("Device {0:X} is not ready. Remember to test devices before addressing them.{1}",
                     deviceno, Environment.NewLine));
-                //tbOutput.Text += string.Format("Device {0:X} is not ready. Remember to test devices before addressing them.{1}",
-                //    deviceno, Environment.NewLine);
                 tbRunAddr.Text = string.Format("{0:X}", ProgramCounter);
                 return false;
             }
@@ -701,8 +695,6 @@ namespace SIC_Debug
             {
                 errors.Enqueue(string.Format("{0:X} does not refer to a known device. Valid options:{1}F2, F3, 04, 05, 06{1}",
                     deviceno, Environment.NewLine));
-                //tbOutput.Text += string.Format("{0:X} does not refer to a known device. Valid options:{1}F2, F3, 04, 05, 06{1}",
-                //    deviceno, Environment.NewLine);
                 tbRunAddr.Text = string.Format("{0:X}", ProgramCounter);
                 return false;
             }
@@ -817,6 +809,8 @@ namespace SIC_Debug
 
         private void btnStep_Click(object sender, EventArgs e)
         {
+            if (ProgramCounter == 0 && ProgramCounter != Convert.ToInt32(tbRunAddr.Text, 16))
+                ProgramCounter = Convert.ToInt32(tbRunAddr.Text, 16);
             devicewrite = false;
             Step();
             tbRunAddr.Text = string.Format("{0:X}", ProgramCounter);
@@ -840,6 +834,7 @@ namespace SIC_Debug
                 tbRunAddr.Text = "0";
                 tbStart.Text = "0";
                 tbEnd.Text = "0";
+                ProgramCounter = 0;
             }
         }
 
@@ -890,9 +885,7 @@ namespace SIC_Debug
                         if (line[0] == 'H')
                         {
                             startaddr += proglen;
-                            //string startaddrstr = line.Split()[1].Substring(0, 6);
                             string proglenstr = line.Split()[1].Substring(6, 6);
-                            //startaddr = Convert.ToInt32(startaddrstr, 16);
                             proglen = Convert.ToInt32(proglenstr, 16);
                             extab.Add(words[0].Substring(1), startaddr);
                         }
