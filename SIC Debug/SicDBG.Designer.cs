@@ -76,6 +76,9 @@
             // 
             // tbOutput
             // 
+            this.tbOutput.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.tbOutput.Font = new System.Drawing.Font("Consolas", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.tbOutput.Location = new System.Drawing.Point(12, 109);
             this.tbOutput.Multiline = true;
@@ -86,6 +89,7 @@
             // 
             // btnLoad
             // 
+            this.btnLoad.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnLoad.Location = new System.Drawing.Point(377, 28);
             this.btnLoad.Name = "btnLoad";
             this.btnLoad.Size = new System.Drawing.Size(75, 23);
@@ -114,6 +118,7 @@
             // 
             // btnBkPt
             // 
+            this.btnBkPt.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnBkPt.Location = new System.Drawing.Point(377, 217);
             this.btnBkPt.Name = "btnBkPt";
             this.btnBkPt.Size = new System.Drawing.Size(75, 23);
@@ -124,6 +129,7 @@
             // 
             // tbBkPt
             // 
+            this.tbBkPt.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.tbBkPt.Location = new System.Drawing.Point(377, 191);
             this.tbBkPt.Name = "tbBkPt";
             this.tbBkPt.Size = new System.Drawing.Size(75, 20);
@@ -131,6 +137,8 @@
             // 
             // lstBkpt
             // 
+            this.lstBkpt.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.lstBkpt.FormattingEnabled = true;
             this.lstBkpt.Location = new System.Drawing.Point(377, 246);
             this.lstBkpt.Name = "lstBkpt";
@@ -139,6 +147,7 @@
             // 
             // btnDelPt
             // 
+            this.btnDelPt.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btnDelPt.Location = new System.Drawing.Point(377, 360);
             this.btnDelPt.Name = "btnDelPt";
             this.btnDelPt.Size = new System.Drawing.Size(75, 23);
@@ -149,6 +158,7 @@
             // 
             // btnRun
             // 
+            this.btnRun.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnRun.Location = new System.Drawing.Point(377, 135);
             this.btnRun.Name = "btnRun";
             this.btnRun.Size = new System.Drawing.Size(75, 23);
@@ -159,6 +169,7 @@
             // 
             // tbRunAddr
             // 
+            this.tbRunAddr.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.tbRunAddr.Location = new System.Drawing.Point(377, 109);
             this.tbRunAddr.Name = "tbRunAddr";
             this.tbRunAddr.Size = new System.Drawing.Size(75, 20);
@@ -177,6 +188,7 @@
             // 
             // label3
             // 
+            this.label3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.label3.AutoSize = true;
             this.label3.Location = new System.Drawing.Point(378, 90);
             this.label3.Name = "label3";
@@ -243,6 +255,8 @@
             // 
             // lstInstructions
             // 
+            this.lstInstructions.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.lstInstructions.Font = new System.Drawing.Font("Consolas", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lstInstructions.FormattingEnabled = true;
             this.lstInstructions.Location = new System.Drawing.Point(459, 56);
@@ -252,6 +266,7 @@
             // 
             // label4
             // 
+            this.label4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.label4.AutoSize = true;
             this.label4.Location = new System.Drawing.Point(458, 40);
             this.label4.Name = "label4";
@@ -261,6 +276,7 @@
             // 
             // btnStep
             // 
+            this.btnStep.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnStep.Location = new System.Drawing.Point(377, 165);
             this.btnStep.Name = "btnStep";
             this.btnStep.Size = new System.Drawing.Size(75, 23);
@@ -271,6 +287,7 @@
             // 
             // cbFT
             // 
+            this.cbFT.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.cbFT.AutoSize = true;
             this.cbFT.Location = new System.Drawing.Point(613, 36);
             this.cbFT.Name = "cbFT";
@@ -281,6 +298,7 @@
             // 
             // button1
             // 
+            this.button1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.button1.Location = new System.Drawing.Point(12, 357);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(75, 23);
@@ -291,6 +309,7 @@
             // 
             // btnLoadEXT
             // 
+            this.btnLoadEXT.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnLoadEXT.Location = new System.Drawing.Point(377, 57);
             this.btnLoadEXT.Name = "btnLoadEXT";
             this.btnLoadEXT.Size = new System.Drawing.Size(75, 23);
@@ -504,7 +523,6 @@
             this.Controls.Add(this.btnLoad);
             this.Controls.Add(this.tbOutput);
             this.Controls.Add(this.menuStrip1);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "SicDBG";
             this.Text = "SIC Debug";
