@@ -35,7 +35,7 @@ namespace SIC_Debug
         COMPR = 0xA0,   // Compare registers, two byte, compare register 1 to register 2, store value in Status Word (Extended only)
         DIVR = 0x9C,    // Divide registers, two byte, store r2 / r1 into r2 (Extended only)
         MULR = 0x98,    // Multiply registers, two byte, store r2 * r1 into r2 (Extended only)
-        RMO = 0xAC,     // ???, two byte, store value from r1 in r2 (Extended only)
+        RMO = 0xAC,     // Register Move, two byte, store value from r1 in r2 (Extended only)
         SUBR = 0x94,    // Subtract registers, two byte, store r2 - r1 in r2 (Extended only)
         TIXR = 0xB8,    // ??? register, two byte, as TIX but compare X to r1 (Extended only)
         LDX = 0x04,     // Load X, load memval into X
