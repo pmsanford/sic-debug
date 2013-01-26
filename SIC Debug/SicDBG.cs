@@ -709,7 +709,6 @@ namespace SIC_Debug
             if (ProgramCounter > 32768 || ProgramCounter < 0)
             {
                 errors.Enqueue(string.Format("Error: Program Counter value 0x{0:X3} outside memory range.", ProgramCounter));
-                //tbOutput.Text += string.Format("Error: Program Counter value 0x{0:X3} outside memory range.", ProgramCounter);
                 tbRunAddr.Text = string.Format("{0:X}", ProgramCounter);
                 return false;
             }
@@ -720,8 +719,8 @@ namespace SIC_Debug
                     if (MessageBox.Show("Probable infinite loop (50000 iterations passed). Break out?",
                         "Infinite Loop Detected", MessageBoxButtons.YesNo) == System.Windows.Forms.DialogResult.Yes)
                         return false;
-                        
-                
+
+
                 if (breakpoints.Contains(ProgramCounter) && shouldbreak)
                 {
                     tbRunAddr.Text = string.Format("{0:X}", ProgramCounter);
@@ -732,16 +731,15 @@ namespace SIC_Debug
                 if (!Step())
                 {
                     errors.Enqueue(string.Format("Fatal error at location {0:X}{1}", ProgramCounter, Environment.NewLine));
-                    //tbOutput.Text += string.Format("Fatal error at location {0:X}{1}", ProgramCounter, Environment.NewLine);
                     tbRunAddr.Text = string.Format("{0:X}", ProgramCounter);
                     return false;
                 }
                 shouldbreak = true;
             }
-                foreach (Instruction instruction in lastInst)
-                {
-                    lstInstructions.Items.Add(instruction);
-                }
+            foreach (Instruction instruction in lastInst)
+            {
+                lstInstructions.Items.Add(instruction);
+            }
             lstInstructions.SelectedIndex = lstInstructions.Items.Count - 1;
             return true;
         }
