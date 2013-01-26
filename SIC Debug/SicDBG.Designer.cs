@@ -261,7 +261,7 @@
             this.lstInstructions.FormattingEnabled = true;
             this.lstInstructions.Location = new System.Drawing.Point(459, 56);
             this.lstInstructions.Name = "lstInstructions";
-            this.lstInstructions.Size = new System.Drawing.Size(234, 290);
+            this.lstInstructions.Size = new System.Drawing.Size(234, 316);
             this.lstInstructions.TabIndex = 13;
             // 
             // label4
@@ -524,6 +524,7 @@
             this.Controls.Add(this.tbOutput);
             this.Controls.Add(this.menuStrip1);
             this.MainMenuStrip = this.menuStrip1;
+            this.MinimumSize = new System.Drawing.Size(722, 426);
             this.Name = "SicDBG";
             this.Text = "SIC Debug";
             this.menuStrip1.ResumeLayout(false);
