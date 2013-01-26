@@ -18,7 +18,8 @@ namespace SIC_Debug
             if (failurecount == 0)
             {
                 failurecount = new Random().Next(1, 5); // This exists so that the device is periodically not ready
-                return (byte)fs.ReadByte();             // Otherwise ready check code would never get hit
+                int readval = fs.ReadByte();
+                return readval == -1 ? (byte)0 : (byte)readval;            
             }
             else
             {
