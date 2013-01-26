@@ -26,8 +26,31 @@ namespace SIC_Debug
         public Register r1;
         public Register r2;
         public int addrof;
+
+        public Instruction(string instruction)
+        {
+            if (instruction.Length < 4 || instruction.Length > 8 || instruction.Length % 2 != 0)
+                throw new InvalidInstructionException();
+
+            byte[] instbytes = new byte[instruction.Length / 2];
+
+            instbytes[0] = Convert.ToByte(instruction.Substring(0, 2), 16);
+            if (instruction.Length > 2)
+                instbytes[1] = Convert.ToByte(instruction.Substring(2, 2), 16);
+            if (instruction.Length > 4)
+                instbytes[2] = Convert.ToByte(instruction.Substring(4, 2), 16);
+            if (instruction.Length > 6)
+                instbytes[3] = Convert.ToByte(instruction.Substring(6, 2), 16);
+
+            buildInstruction(instbytes);
+        }
+
         public Instruction(byte[] inputbytes)
         {
+            buildInstruction(inputbytes);
+        }
+
+        private void buildInstruction(byte[] inputbytes) {
             instruction = inputbytes;
             opcode = (OpCode)(inputbytes[0] & 0xFC);
             if (isTwoByte(opcode))
@@ -112,5 +135,9 @@ namespace SIC_Debug
                 return false;
         }
 
+    }
+
+    class InvalidInstructionException : Exception
+    {
     }
 }
