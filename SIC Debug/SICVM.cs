@@ -12,6 +12,8 @@ namespace SIC_Debug
             Partial,
             Full
         }
+
+        //TODO: "Each register is 24 bits in length" Beck p5
         public int RegisterA { get; set; }
         public int RegisterB { get; set; }
         public int RegisterX { get; set; }
@@ -44,7 +46,7 @@ namespace SIC_Debug
             Trace = TracingLevel.Partial;
             RegisterA = RegisterB = RegisterX = RegisterS = RegisterL = RegisterT = ProgramCounter = StatusWord = 0;
             AllowWriting = BreakpointReached = false;
-            memory = Enumerable.Repeat<byte>(0xFF, 32768).ToArray<byte>();
+            memory = Enumerable.Repeat<byte>(0xFF, 32768).ToArray<byte>(); // 32768 bytes, 32Kb, Beck p5
             errors = new Queue<string>();
             lastInst = new Queue<Instruction>();
             devices = new Device[7];
