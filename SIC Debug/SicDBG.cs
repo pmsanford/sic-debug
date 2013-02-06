@@ -241,6 +241,12 @@ namespace SIC_Debug
             string errorMsgs = "";
             while (vm.Errors.Count > 0)
                 errorMsgs += vm.Errors.Dequeue() + System.Environment.NewLine;
+            lstInstructions.Items.Clear();
+            foreach (Instruction instruction in vm.Stack)
+            {
+                lstInstructions.Items.Add(instruction);
+            }
+            lstInstructions.SelectedIndex = lstInstructions.Items.Count - 1;
             SetRegisters();
             OutputMemdump(errorMsgs);
         }
