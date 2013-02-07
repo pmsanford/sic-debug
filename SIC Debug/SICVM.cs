@@ -461,7 +461,7 @@ namespace SIC_Debug
                             location -= 4;
                         else
                             location -= 3;
-                        //TODO: Handle unrecognized opcode.
+                        errors.Enqueue(string.Format("Error: Instruction at 0x{0} not a recognized opcode.", !current.extended ? ProgramCounter.ToString("X3") : ProgramCounter.ToString("X4")));
                         return false;
                 }
             }
