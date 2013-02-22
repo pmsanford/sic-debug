@@ -282,11 +282,6 @@ namespace SIC_Debug
 
         private void btnLoadEXT_Click(object sender, EventArgs e)
         {
-            //TODO: Move this to the VM object
-            Queue<String> errors = new Queue<string>();
-            byte[] memory = Enumerable.Repeat<byte>(0xFF, 32768).ToArray<byte>();
-            //TODO: Above variables should be at object level.
-
             OpenFileDialog dialog = new OpenFileDialog();
             if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
@@ -303,114 +298,22 @@ namespace SIC_Debug
                 StreamReader reader = new StreamReader(infile);
                 string infilestr = reader.ReadToEnd();
                 reader.Close();
-                string[] lines = infilestr.Split("\r\n".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
-                int startaddr = 0;
-                int currentaddr = 0;
-                int proglen = 0;
-                Dictionary<string, int> extab = new Dictionary<string, int>();
-                /* This is necessary to build the extdef table prior to loading. We must do two passes because
-                 * programs may reference labels defined in other places. We can either build this table now,
-                 * and do the rest in one pass, OR we could load and build the table and do modifications in
-                 * a second pass. I chose this way.
-                 */
-                foreach (string line in lines)
-                {
-                    if (line[0] == 'D' || line[0] == 'H')
-                    {
-                        string[] words = line.Split(' ');
-                        if (line[0] == 'H')
-                        {
-                            startaddr += proglen;
-                            string proglenstr = line.Split()[1].Substring(6, 6);
-                            proglen = Convert.ToInt32(proglenstr, 16);
-                            extab.Add(words[0].Substring(1), startaddr);
-                        }
-                        if (line[0] == 'D')
-                        {
-                            extab.Add(words[0].Substring(1), Convert.ToInt32(words[1].Substring(0, 6), 16) + startaddr);
-                            for (int k = 1; k < words.Length; k += 2)
-                            {
-                                if (words[k].Length <= 6)
-                                {
-                                    break;
-                                }
-                                extab.Add(words[k].Substring(6), Convert.ToInt32(words[k + 1].Substring(0, 6), 16) + startaddr);
-                            }
-                        }
-                    }
-                }
-                tbStart.Text = "0";
-                tbEnd.Text = string.Format("{0:X}", startaddr + proglen);
-                int i;
-                for (i = 0; i < lines.Length; i++)
-                {
-                    if (lines[i] == "")
-                        continue;
-                    if (lines[i][0] != 'H')
-                    {
-                        errors.Enqueue(string.Format("ERROR: Expected 'H' record on line {2}, encountered this instead:{0}{1}{0}",
-                            Environment.NewLine, lines[i], i));
-                        break;
-                    }
-                    startaddr = extab[lines[i].Split(' ')[0].Substring(1)];
-                    i++;
-                    while (lines[i][0] == 'D')
-                    {
-                        i++;
-                    }
-                    while (lines[i][0] == 'R')
-                    {
-                        i++;
-                    }
-                    while (lines[i][0] == 'T')
-                    {
-                        currentaddr = Convert.ToInt32(lines[i].Substring(1, 6), 16) + startaddr;
-                        int len = Convert.ToInt32(lines[i].Substring(7, 2), 16) * 2;
-                        for (int j = 9; j < len + 9; j += 2)
-                        {
-                            memory[currentaddr] = Convert.ToByte(lines[i].Substring(j, 2), 16);
-                            currentaddr++;
-                        }
-                        i++;
-                    }
-                    while (lines[i][0] == 'M')
-                    {
-                        int modaddr = Convert.ToInt32(lines[i].Substring(1, 6), 16) + startaddr;
-                        int bytes = Convert.ToInt32(lines[i].Substring(7, 2), 16);
-                        uint mask = bytes > 0 ? (uint)15 : 0;
-                        for (int j = 0; j < bytes; j++)
-                        {
-                            mask = mask << 4;
-                            mask += 15;
-                        }
-                        char op = lines[i][9];
-                        string symbol = lines[i].Substring(10);
-                        byte[] membytes = { memory[modaddr + 2], memory[modaddr + 1], memory[modaddr], 0 };
-                        uint memval = BitConverter.ToUInt32(membytes, 0);
-                        if (((memval & mask) + (extab[symbol] & mask) > mask) && op == '+')
-                            errors.Enqueue(string.Format("Overflow in add instruction at address {0}.", modaddr));
-                        if (op == '+')
-                        {
-                            memval += (uint)extab[symbol] & mask;
-                        }
-                        else
-                        {
-                            memval -= (uint)extab[symbol] & mask;
-                        }
-                        byte[] result = BitConverter.GetBytes(memval);
-                        memory[modaddr + 2] = result[0];
-                        memory[modaddr + 1] = result[1];
-                        memory[modaddr] = result[2];
-                        i++;
-                    }
-                }
-                if (i != lines.Length)
-                    errors.Enqueue("WARNING: File did not end in E record.");
-                string errorMsgs = "";
-                while (errors.Count > 0)
-                    errorMsgs += errors.Dequeue();
 
-                OutputMemdump(errorMsgs);
+                Tuple<int, int> addresses = vm.LoadXEObjectFile(infilestr);
+
+                int endaddr = addresses.Item2;
+                if (addresses.Item2 - addresses.Item1 > 0x130)
+                {
+                    tbOutput.Text += string.Format("Loaded code covers more than 20 lines, showing first 20. You can show more above.{0}", Environment.NewLine);
+                    endaddr = addresses.Item1 + 0x130;
+                }
+                tbStart.Text = string.Format("{0:X}", addresses.Item1);
+                tbEnd.Text = string.Format("{0:X}", endaddr);
+                tbRunAddr.Text = string.Format("{0:X}", addresses.Item1);
+
+                OutputMemdump(addresses.Item1, endaddr);
+
+                tbOutput.Text += System.Environment.NewLine;
             }
         }
 
