@@ -78,20 +78,20 @@ namespace SIC_Debug
                     if (line[0] == 'H')
                     {
                         startaddr += proglen;
-                        string proglenstr = line.Split(" ".ToArray(), StringSplitOptions.RemoveEmptyEntries)[1].Substring(6, 6);
+                        string proglenstr = line.Substring(13, 6);
                         proglen = Convert.ToInt32(proglenstr, 16);
-                        extab.Add(words[0].Substring(1), startaddr);
+                        extab.Add(line.Substring(1, 6), startaddr);
                     }
                     if (line[0] == 'D')
                     {
-                        extab.Add(words[0].Substring(1), Convert.ToInt32(words[1].Substring(0, 6), 16) + startaddr);
-                        for (int k = 1; k < words.Length; k += 2)
+                        extab.Add(line.Substring(1, 6), Convert.ToInt32(line.Substring(7, 6), 16) + startaddr);
+                        for (int k = 13; k < line.Length; k += 12)
                         {
-                            if (words[k].Length <= 6)
+                            if (line.Substring(k).Length <= 12)
                             {
                                 break;
                             }
-                            extab.Add(words[k].Substring(6), Convert.ToInt32(words[k + 1].Substring(0, 6), 16) + startaddr);
+                            extab.Add(line.Substring(k, 6), Convert.ToInt32(line.Substring(k + 6, 6), 16) + startaddr);
                         }
                     }
                 }
@@ -109,7 +109,7 @@ namespace SIC_Debug
                         Environment.NewLine, lines[i], i));
                     break;
                 }
-                startaddr = extab[lines[i].Split(' ')[0].Substring(1)];
+                startaddr = extab[lines[i].Substring(1, 6)];
                 i++;
                 while (lines[i][0] == 'D')
                 {
@@ -145,7 +145,7 @@ namespace SIC_Debug
                     List<byte> membytes = new List<byte>();
                     for (int j = bytes; j > 0; j -= 2)
                     {
-                        int memadd = Convert.ToInt32(Math.Ceiling(j / 2.0)) - 1;
+                        int memadd = Convert.ToInt32(Math.Ceiling(j / 2.0));
                         membytes.Add(memory[modaddr + memadd]);
                     }
                     while (membytes.Count < 4)
@@ -165,8 +165,8 @@ namespace SIC_Debug
                     byte[] result = BitConverter.GetBytes(memval);
                     for (int j = bytes; j > 0; j -= 2)
                     {
-                        int memadd = Convert.ToInt32(Math.Ceiling(j / 2.0)) - 1;
-                        memory[modaddr + memadd] = result[Convert.ToInt32(Math.Ceiling(bytes / 2.0) - 1) - memadd];
+                        int memadd = Convert.ToInt32(Math.Ceiling(j / 2.0));
+                        memory[modaddr + memadd] = result[Convert.ToInt32(Math.Ceiling(bytes / 2.0)) - memadd];
                     }
                     /*
                     memory[modaddr + 2] = result[0];
