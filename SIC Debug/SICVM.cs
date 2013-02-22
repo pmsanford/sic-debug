@@ -52,7 +52,7 @@ namespace SIC_Debug
             devices = new Device[7];
             for (int i = 0; i < devices.Length; i++)
             {
-                devices[i] = new Device();
+                devices[i] = new SimpleFileDevice();
             }
             breakpoints = new List<int>();
         }
@@ -78,7 +78,7 @@ namespace SIC_Debug
                     if (line[0] == 'H')
                     {
                         startaddr += proglen;
-                        string proglenstr = line.Split()[1].Substring(6, 6);
+                        string proglenstr = line.Split(" ".ToArray(), StringSplitOptions.RemoveEmptyEntries)[1].Substring(6, 6);
                         proglen = Convert.ToInt32(proglenstr, 16);
                         extab.Add(words[0].Substring(1), startaddr);
                     }
@@ -142,8 +142,16 @@ namespace SIC_Debug
                     }
                     char op = lines[i][9];
                     string symbol = lines[i].Substring(10);
-                    byte[] membytes = { memory[modaddr + 2], memory[modaddr + 1], memory[modaddr], 0 };
-                    uint memval = BitConverter.ToUInt32(membytes, 0);
+                    List<byte> membytes = new List<byte>();
+                    for (int j = bytes; j > 0; j -= 2)
+                    {
+                        int memadd = Convert.ToInt32(Math.Ceiling(j / 2.0)) - 1;
+                        membytes.Add(memory[modaddr + memadd]);
+                    }
+                    while (membytes.Count < 4)
+                        membytes.Add(0);
+                    //byte[] membytes = { memory[modaddr + 2], memory[modaddr + 1], memory[modaddr], 0 };
+                    uint memval = BitConverter.ToUInt32(membytes.ToArray(), 0);
                     if (((memval & mask) + (extab[symbol] & mask) > mask) && op == '+')
                         errors.Enqueue(string.Format("Overflow in add instruction at address {0}.", modaddr));
                     if (op == '+')
@@ -155,9 +163,16 @@ namespace SIC_Debug
                         memval -= (uint)extab[symbol] & mask;
                     }
                     byte[] result = BitConverter.GetBytes(memval);
+                    for (int j = bytes; j > 0; j -= 2)
+                    {
+                        int memadd = Convert.ToInt32(Math.Ceiling(j / 2.0)) - 1;
+                        memory[modaddr + memadd] = result[Convert.ToInt32(Math.Ceiling(bytes / 2.0) - 1) - memadd];
+                    }
+                    /*
                     memory[modaddr + 2] = result[0];
                     memory[modaddr + 1] = result[1];
                     memory[modaddr] = result[2];
+                     */
                     i++;
                 }
             }

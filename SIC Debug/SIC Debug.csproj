@@ -60,6 +60,7 @@
       <DependentUpon>Config.cs</DependentUpon>
     </Compile>
     <Compile Include="Device.cs" />
+    <Compile Include="SimpleFileDevice.cs" />
     <Compile Include="Instruction.cs" />
     <Compile Include="SicDBG.cs">
       <SubType>Form</SubType>

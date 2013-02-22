@@ -12,26 +12,26 @@ namespace SIC_Debug
 {
     public partial class Config : Form
     {
-        Device[] devices;
+        SimpleFileDevice[] devices;
         TextBox[] tbs;
         public Config(ref Device[] devices)
         {
             InitializeComponent();
-            this.devices = devices;
-            if (devices[0].fs != null)
-                tbFile00.Text = devices[0].fs.Name;
-            if (devices[1].fs != null)
-                tbFileF1.Text = devices[1].fs.Name;
-            if (devices[2].fs != null)
-                tbFileF2.Text = devices[2].fs.Name;
-            if (devices[3].fs != null)
-                tbFileF3.Text = devices[3].fs.Name;
-            if (devices[4].fs != null)
-                tbFile04.Text = devices[4].fs.Name;
-            if (devices[5].fs != null)
-                tbFile05.Text = devices[5].fs.Name;
-            if (devices[6].fs != null)
-                tbFile06.Text = devices[6].fs.Name;
+            this.devices = (SimpleFileDevice[])devices;
+            if ((devices[0] is SimpleFileDevice) && ((SimpleFileDevice)devices[0]).fs != null)
+                tbFile00.Text = ((SimpleFileDevice)devices[6]).fs.Name;
+            if ((devices[1] is SimpleFileDevice) && ((SimpleFileDevice)devices[1]).fs != null)
+                tbFileF1.Text = ((SimpleFileDevice)devices[6]).fs.Name;
+            if ((devices[2] is SimpleFileDevice) && ((SimpleFileDevice)devices[2]).fs != null)
+                tbFileF2.Text = ((SimpleFileDevice)devices[6]).fs.Name;
+            if ((devices[3] is SimpleFileDevice) && ((SimpleFileDevice)devices[3]).fs != null)
+                tbFileF3.Text = ((SimpleFileDevice)devices[6]).fs.Name;
+            if ((devices[4] is SimpleFileDevice) && ((SimpleFileDevice)devices[4]).fs != null)
+                tbFile04.Text = ((SimpleFileDevice)devices[6]).fs.Name;
+            if ((devices[5] is SimpleFileDevice) && ((SimpleFileDevice)devices[5]).fs != null)
+                tbFile05.Text = ((SimpleFileDevice)devices[6]).fs.Name;
+            if ((devices[6] is SimpleFileDevice) && ((SimpleFileDevice)devices[6]).fs != null)
+                tbFile06.Text = ((SimpleFileDevice)devices[6]).fs.Name;
             tbs = new TextBox[7];
             tbs[0] = tbFile00;
             tbs[1] = tbFileF1;
