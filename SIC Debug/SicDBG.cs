@@ -150,7 +150,7 @@ namespace SIC_Debug
             try
             {
                 int newpt = Convert.ToInt32(tbBkPt.Text, 16);
-                if (newpt < 0 || newpt > 32766)
+                if (newpt < 0 || newpt > 1048575)
                 {
                     MessageBox.Show("Breakpoint out of range.");
                 }
