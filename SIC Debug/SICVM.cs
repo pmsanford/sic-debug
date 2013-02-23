@@ -454,6 +454,11 @@ namespace SIC_Debug
         public bool Step()
         {
             this.devicewrite = false;
+            current = getInstruction();
+            SICEvent instEvent = new SICEvent(current, ProgramCounter);
+            PreInstructionHook(instEvent);
+            if (!instEvent.Continue)
+                return false;
             current.addrof = ProgramCounter;
             IncrementPC(current);
             if (current.twobyte)
@@ -598,6 +603,12 @@ namespace SIC_Debug
             }
 
             lastInstruction = current;
+
+
+            instEvent = new SICEvent(lastInstruction, ProgramCounter);
+            PostInstructionHook(instEvent);
+            if (!instEvent.Continue)
+                return false;
             return true;
         }
 
@@ -631,6 +642,7 @@ namespace SIC_Debug
             ProgramCounter = startingaddr;
             int currentaddr = startingaddr;
             int counter = 0;
+            errors.Clear();
             if (ProgramCounter > 32768 || ProgramCounter < 0)
             {
                 errors.Enqueue(string.Format("Error: Program Counter value 0x{0:X3} outside memory range.", ProgramCounter));
@@ -645,22 +657,20 @@ namespace SIC_Debug
                     return false;
                 }
 
-                current = getInstruction();
-                SICEvent instEvent = new SICEvent(current, ProgramCounter);
-                PreInstructionHook(instEvent);
-                if (!instEvent.Continue)
-                    return true;
 
                 if (!Step())
                 {
-                    errors.Enqueue(string.Format("Fatal error at location {0:X}{1}", ProgramCounter, Environment.NewLine));
-                    return false;
+                    if (errors.Count > 0)
+                    {
+                        errors.Enqueue(string.Format("Fatal error at location {0:X}{1}", ProgramCounter, Environment.NewLine));
+                        return false;
+                    }
+                    else
+                    {
+                        return true;
+                    }
                 }
 
-                instEvent = new SICEvent(lastInstruction, ProgramCounter);
-                PostInstructionHook(instEvent);
-                if (!instEvent.Continue)
-                    return true;
             }
         }
     }

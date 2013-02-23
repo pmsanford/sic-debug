@@ -268,7 +268,6 @@ namespace SIC_Debug
             if (vm.ProgramCounter == 0 && vm.ProgramCounter != Convert.ToInt32(tbRunAddr.Text, 16))
                 vm.ProgramCounter = Convert.ToInt32(tbRunAddr.Text, 16);
             vm.Step();
-            trace.Enqueue(vm.lastInstruction);
             tbRunAddr.Text = string.Format("{0:X}", vm.ProgramCounter);
             string errorMsgs = "";
             while (vm.Errors.Count > 0)
