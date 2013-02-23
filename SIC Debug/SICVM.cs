@@ -23,7 +23,6 @@ namespace SIC_Debug
         public int ProgramCounter { get; set; }
         public int StatusWord { get; set; }
         public bool AllowWriting { get; set; }
-        public TracingLevel Trace { get; set; }
         public Device[] Devices { get { return devices; } }
         public byte[] Memory { get { return memory; } }
         public bool DeviceWritten { get { return devicewrite; } }
@@ -46,7 +45,6 @@ namespace SIC_Debug
 
         public SICVM()
         {
-            Trace = TracingLevel.Partial;
             RegisterA = RegisterB = RegisterX = RegisterS = RegisterL = RegisterT = ProgramCounter = StatusWord = 0;
             AllowWriting = false;
             memory = Enumerable.Repeat<byte>(0xFF, 1048575).ToArray<byte>(); // 1048575 bytes, 1Mb, is the memory range for XE machines.
