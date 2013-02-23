@@ -463,6 +463,15 @@ namespace SIC_Debug
             if (current.twobyte)
             {
                 DoTwoBye(current);
+
+                lastInstruction = current;
+
+
+                instEvent = new SICEvent(lastInstruction, ProgramCounter);
+                PostInstructionHook(instEvent);
+                if (!instEvent.Continue)
+                    return false;
+
                 return true;
             }
 
