@@ -50,7 +50,7 @@ namespace SIC_Debug
             Trace = TracingLevel.Partial;
             RegisterA = RegisterB = RegisterX = RegisterS = RegisterL = RegisterT = ProgramCounter = StatusWord = 0;
             AllowWriting = false;
-            memory = Enumerable.Repeat<byte>(0xFF, 32768).ToArray<byte>(); // 32768 bytes, 32Kb, Beck p5
+            memory = Enumerable.Repeat<byte>(0xFF, 1048575).ToArray<byte>(); // 1048575 bytes, 1Mb, is the memory range for XE machines.
             errors = new Queue<string>();
             lastInst = new Queue<Instruction>();
             devices = new Device[7];
