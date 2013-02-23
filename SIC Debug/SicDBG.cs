@@ -17,6 +17,8 @@ namespace SIC_Debug
         SICVM vm;
         List<int> Breakpoints = new List<int>();
         Queue<Instruction> trace = new Queue<Instruction>();
+        Queue<string> messages = new Queue<string>();
+        int? lastBP = null;
 
         static List<char> HexChars = new List<char>(new char[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f', 'A', 'B', 'C', 'D', 'E', 'F', '\b' });
 
@@ -155,7 +157,6 @@ namespace SIC_Debug
                 else
                 {
                     Breakpoints.Add(newpt);
-                    //vm.Breakpoints.Add(newpt);
                     lstBkpt.Items.Add(string.Format("{0:X}", newpt));
                     tbBkPt.Text = "";
                 }
@@ -168,13 +169,15 @@ namespace SIC_Debug
 
         private void breakptHandler(SICEvent e)
         {
-            if (Breakpoints.Contains(e.PC))
+            if (Breakpoints.Contains(e.PC) && (lastBP != e.PC))
             {
                 e.Continue = false;
-                string msgs = string.Format("Breakpoint reached at 0x{0:X4}.", vm.ProgramCounter);
+                messages.Enqueue(string.Format("Breakpoint reached at 0x{0:X4}.", vm.ProgramCounter));
                 tbRunAddr.Text = string.Format("{0:X}", vm.ProgramCounter);
-                OutputMemdump(Convert.ToInt32(tbStart.Text, 16), Convert.ToInt32(tbEnd.Text, 16), msgs);
+                lastBP = e.PC;
             }
+            else if (lastBP != null)
+                lastBP = null;
         }
 
         private void traceHandler(SICEvent e)
@@ -213,8 +216,15 @@ namespace SIC_Debug
             {
                 memmsg = string.Format("Error: {0} - {1}", ex.Message, ex.InnerException != null ? ex.InnerException.Message : "");
             }
+            StringBuilder builder = new StringBuilder();
+            foreach (string msg in messages)
+                builder.AppendLine(msg);
 
-            OutputMemdump(Convert.ToInt32(tbStart.Text, 16), Convert.ToInt32(tbEnd.Text, 16), memmsg);
+            messages.Clear();
+
+            builder.AppendLine(memmsg);
+
+            OutputMemdump(Convert.ToInt32(tbStart.Text, 16), Convert.ToInt32(tbEnd.Text, 16), builder.ToString());
 
             foreach (Instruction instruction in trace)
             {
@@ -243,7 +253,6 @@ namespace SIC_Debug
                 if (lstBkpt.SelectedIndex >= 0)
                 {
                     Breakpoints.Remove(Convert.ToInt32(lstBkpt.Items[lstBkpt.SelectedIndex].ToString(), 16));
-                    //vm.Breakpoints.Remove(Convert.ToInt32(lstBkpt.Items[lstBkpt.SelectedIndex].ToString(), 16));
                     lstBkpt.Items.RemoveAt(lstBkpt.SelectedIndex);
                 }
             }
@@ -284,7 +293,15 @@ namespace SIC_Debug
             }
             lstInstructions.SelectedIndex = lstInstructions.Items.Count - 1;
             SetRegisters();
-            OutputMemdump(memmsg);
+
+            StringBuilder builder = new StringBuilder();
+            foreach (string msg in messages)
+                builder.AppendLine(msg);
+
+            messages.Clear();
+
+            builder.AppendLine(memmsg);
+            OutputMemdump(builder.ToString());
         }
 
         private void allowWritingToolStripMenuItem_Click(object sender, EventArgs e)
