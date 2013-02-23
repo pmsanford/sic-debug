@@ -60,6 +60,9 @@
       <DependentUpon>Config.cs</DependentUpon>
     </Compile>
     <Compile Include="Device.cs" />
+    <Compile Include="SICEvent.cs" />
+    <Compile Include="SICWarning.cs" />
+    <Compile Include="SimpleFileDevice.cs" />
     <Compile Include="Instruction.cs" />
     <Compile Include="SicDBG.cs">
       <SubType>Form</SubType>
@@ -70,6 +73,7 @@
     <Compile Include="Opcodes.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SICVM.cs" />
     <EmbeddedResource Include="AboutBox.resx">
       <DependentUpon>AboutBox.cs</DependentUpon>
     </EmbeddedResource>
