@@ -192,6 +192,7 @@ namespace SIC_Debug
 
         private void btnRun_Click(object sender, EventArgs e)
         {
+            string memmsg = "";
             try
             {
                 bool success = vm.Run(Convert.ToInt32(tbRunAddr.Text, 16));
@@ -208,14 +209,13 @@ namespace SIC_Debug
             {
                 MessageBox.Show("Unknown device.");
             }
+            catch (Exception ex)
+            {
+                memmsg = string.Format("Error: {0} - {1}", ex.Message, ex.InnerException != null ? ex.InnerException.Message : "");
+            }
 
-            string errorMsgs = "";
-            while (vm.Errors.Count > 0) 
-                errorMsgs += vm.Errors.Dequeue() + System.Environment.NewLine;
-            /*if (vm.BreakpointReached)
-                errorMsgs += string.Format("Breakpoint reached at 0x{0:X4}.", vm.ProgramCounter);
-            tbRunAddr.Text = string.Format("{0:X}", vm.ProgramCounter);
-            OutputMemdump(Convert.ToInt32(tbStart.Text, 16), Convert.ToInt32(tbEnd.Text, 16), errorMsgs);*/
+            OutputMemdump(Convert.ToInt32(tbStart.Text, 16), Convert.ToInt32(tbEnd.Text, 16), memmsg);
+
             foreach (Instruction instruction in trace)
             {
                 lstInstructions.Items.Add(instruction);
@@ -267,11 +267,16 @@ namespace SIC_Debug
         {
             if (vm.ProgramCounter == 0 && vm.ProgramCounter != Convert.ToInt32(tbRunAddr.Text, 16))
                 vm.ProgramCounter = Convert.ToInt32(tbRunAddr.Text, 16);
-            vm.Step();
+            string memmsg = "";
+            try
+            {
+                vm.Step();
+            }
+            catch (Exception ex)
+            {
+                memmsg = string.Format("Error: {0} - {1}", ex.Message, ex.InnerException != null ? ex.InnerException.Message : "");
+            }
             tbRunAddr.Text = string.Format("{0:X}", vm.ProgramCounter);
-            string errorMsgs = "";
-            while (vm.Errors.Count > 0)
-                errorMsgs += vm.Errors.Dequeue() + System.Environment.NewLine;
             lstInstructions.Items.Clear();
             foreach (Instruction instruction in trace)
             {
@@ -279,7 +284,7 @@ namespace SIC_Debug
             }
             lstInstructions.SelectedIndex = lstInstructions.Items.Count - 1;
             SetRegisters();
-            OutputMemdump(errorMsgs);
+            OutputMemdump(memmsg);
         }
 
         private void allowWritingToolStripMenuItem_Click(object sender, EventArgs e)

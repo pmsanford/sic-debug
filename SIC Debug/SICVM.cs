@@ -24,14 +24,12 @@ namespace SIC_Debug
         public int StatusWord { get; set; }
         public bool AllowWriting { get; set; }
         public TracingLevel Trace { get; set; }
-        public Queue<String> Errors { get { return errors; } }
         public Device[] Devices { get { return devices; } }
         public byte[] Memory { get { return memory; } }
         public bool DeviceWritten { get { return devicewrite; } }
 
         private byte[] memory;
         public Device[] devices; //TODO: This should be private.
-        private Queue<String> errors;
         private bool devicewrite;
         public Instruction lastInstruction = null;
         private Instruction current = null;
@@ -40,9 +38,11 @@ namespace SIC_Debug
 
         public delegate void PreInstruction(SICEvent args);
         public delegate void PostInstruction(SICEvent args);
+        public delegate void WarningHandler(SICWarning args);
 
         public PreInstruction PreInstructionHook;
         public PostInstruction PostInstructionHook;
+        public WarningHandler WarningHook;
 
         public SICVM()
         {
@@ -50,7 +50,6 @@ namespace SIC_Debug
             RegisterA = RegisterB = RegisterX = RegisterS = RegisterL = RegisterT = ProgramCounter = StatusWord = 0;
             AllowWriting = false;
             memory = Enumerable.Repeat<byte>(0xFF, 1048575).ToArray<byte>(); // 1048575 bytes, 1Mb, is the memory range for XE machines.
-            errors = new Queue<string>();
             devices = new Device[7];
             for (int i = 0; i < devices.Length; i++)
             {
@@ -58,6 +57,7 @@ namespace SIC_Debug
             }
             PreInstructionHook = null;
             PostInstructionHook = null;
+            WarningHook = null;
         }
 
         public Tuple<int, int> LoadXEObjectFile(string filecontents)
@@ -108,9 +108,8 @@ namespace SIC_Debug
                     continue;
                 if (lines[i][0] != 'H')
                 {
-                    errors.Enqueue(string.Format("ERROR: Expected 'H' record on line {2}, encountered this instead:{0}{1}{0}",
+                    throw new FormatException(string.Format("ERROR: Expected 'H' record on line {2}, encountered this instead:{0}{1}{0}",
                         Environment.NewLine, lines[i], i));
-                    break;
                 }
                 startaddr = extab[lines[i].Substring(1, 6)];
                 i++;
@@ -156,7 +155,7 @@ namespace SIC_Debug
 
                     uint memval = BitConverter.ToUInt32(membytes.ToArray(), 0);
                     if (((memval & mask) + (extab[symbol] & mask) > mask) && op == '+')
-                        errors.Enqueue(string.Format("Overflow in add instruction at address {0}.", modaddr));
+                        throw new OverflowException(string.Format("Overflow in add instruction at address {0}.", modaddr));
                     if (op == '+')
                     {
                         memval += (uint)extab[symbol] & mask;
@@ -176,10 +175,12 @@ namespace SIC_Debug
                 }
             }
             if (i != lines.Length)
-                errors.Enqueue("WARNING: File did not end in E record.");
-            string errorMsgs = "";
-            while (errors.Count > 0)
-                errorMsgs += errors.Dequeue();
+            {
+                SICWarning warning = new SICWarning("No E record found at end of file.", "XE Object Loader");
+                WarningHook(warning);
+                if (warning.Abort)
+                    throw new Exception(string.Format("Loading aborted. {0}", warning.Message));
+            }
 
             return rettup;
         }
@@ -474,10 +475,9 @@ namespace SIC_Debug
             {
                 memval = GetData(current);
             }
-            catch (IndexOutOfRangeException)
+            catch (IndexOutOfRangeException ex)
             {
-                errors.Enqueue(string.Format("Error: Instruction at 0x{0:X3} references memory that's out of range (0x{1:X3}).", ProgramCounter, calcaddr));
-                return false;
+                throw new IndexOutOfRangeException(string.Format("Error: Instruction at 0x{0:X3} references memory that's out of range (0x{1:X3}).", ProgramCounter, calcaddr), ex);
             }
 
             try
@@ -592,14 +592,12 @@ namespace SIC_Debug
                             location -= 4;
                         else
                             location -= 3;
-                        errors.Enqueue(string.Format("Error: Instruction at 0x{0} not a recognized opcode.", !current.extended ? ProgramCounter.ToString("X3") : ProgramCounter.ToString("X4")));
-                        return false;
+                        throw new ArgumentException(string.Format("Error: Instruction at 0x{0} not a recognized opcode.", !current.extended ? ProgramCounter.ToString("X3") : ProgramCounter.ToString("X4")));
                 }
             }
-            catch (IndexOutOfRangeException)
+            catch (IndexOutOfRangeException ex)
             {
-                errors.Enqueue(string.Format("Error: Instruction at 0x{0:X3} references memory that's out of range (0x{1:X3}).", ProgramCounter - 3, calcaddr));
-                return false;
+                throw new IndexOutOfRangeException(string.Format("Error: Instruction at 0x{0:X3} references memory that's out of range (0x{1:X3}).", ProgramCounter - 3, calcaddr), ex);
             }
 
             lastInstruction = current;
@@ -643,36 +641,15 @@ namespace SIC_Debug
             this.devicewrite = false;
             ProgramCounter = startingaddr;
             int currentaddr = startingaddr;
-            int counter = 0;
-            errors.Clear();
             if (ProgramCounter > 32768 || ProgramCounter < 0)
-            {
-                errors.Enqueue(string.Format("Error: Program Counter value 0x{0:X3} outside memory range.", ProgramCounter));
-                return false;
-            }
+                throw new IndexOutOfRangeException(string.Format("Error: Program Counter value 0x{0:X3} outside memory range.", ProgramCounter));
+
             while (true)
             {
-                counter++;
-                if (counter >= 50000)
-                {
-                    errors.Enqueue("Infinite loop encountered.");
-                    return false;
-                }
-
-
                 if (!Step())
                 {
-                    if (errors.Count > 0)
-                    {
-                        errors.Enqueue(string.Format("Fatal error at location {0:X}{1}", ProgramCounter, Environment.NewLine));
-                        return false;
-                    }
-                    else
-                    {
-                        return true;
-                    }
+                    return true;
                 }
-
             }
         }
     }

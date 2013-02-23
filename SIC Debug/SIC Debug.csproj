@@ -61,6 +61,7 @@
     </Compile>
     <Compile Include="Device.cs" />
     <Compile Include="SICEvent.cs" />
+    <Compile Include="SICWarning.cs" />
     <Compile Include="SimpleFileDevice.cs" />
     <Compile Include="Instruction.cs" />
     <Compile Include="SicDBG.cs">
