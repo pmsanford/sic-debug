@@ -615,7 +615,9 @@ namespace SIC_Debug
         public bool DoDevice(OpCode op, int memval)
         {
             byte[] regA = BitConverter.GetBytes(RegisterA);
-            byte deviceno = (byte)((memval & 0x00FF0000) >> 16); switch (op)
+            byte deviceno = (byte)((memval & 0x00FF0000) >> 16); 
+            
+            switch (op)
             {
                 case OpCode.RD:
                     byte[] rdVal = { GetDevice(deviceno).Read(), regA[1], regA[2], regA[3] };
