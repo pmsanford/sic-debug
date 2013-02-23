@@ -25,8 +25,6 @@ namespace SIC_Debug
         public bool AllowWriting { get; set; }
         public TracingLevel Trace { get; set; }
         public Queue<String> Errors { get { return errors; } }
-        public Queue<Instruction> Stack { get { return lastInst; } }
-        public List<int> Breakpoints { get { return breakpoints; } }
         public Device[] Devices { get { return devices; } }
         public bool BreakpointReached { get; set; }
         public byte[] Memory { get { return memory; } }
@@ -38,8 +36,16 @@ namespace SIC_Debug
         private Queue<Instruction> lastInst;
         private Queue<String> errors;
         private bool devicewrite;
+        public Instruction lastInstruction = null;
+        private Instruction current = null;
 
         private static List<char> HexChars = new List<char>(new char[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f', 'A', 'B', 'C', 'D', 'E', 'F', '\b' });
+
+        public delegate void PreInstruction(SICEvent args);
+        public delegate void PostInstruction(SICEvent args);
+
+        public PreInstruction PreInstructionHook;
+        public PostInstruction PostInstructionHook;
 
         public SICVM()
         {
@@ -55,6 +61,8 @@ namespace SIC_Debug
                 devices[i] = new SimpleFileDevice();
             }
             breakpoints = new List<int>();
+            PreInstructionHook = null;
+            PostInstructionHook = null;
         }
 
         public Tuple<int, int> LoadXEObjectFile(string filecontents)
@@ -150,7 +158,7 @@ namespace SIC_Debug
                     }
                     while (membytes.Count < 4)
                         membytes.Add(0);
-                    //byte[] membytes = { memory[modaddr + 2], memory[modaddr + 1], memory[modaddr], 0 };
+
                     uint memval = BitConverter.ToUInt32(membytes.ToArray(), 0);
                     if (((memval & mask) + (extab[symbol] & mask) > mask) && op == '+')
                         errors.Enqueue(string.Format("Overflow in add instruction at address {0}.", modaddr));
@@ -168,11 +176,7 @@ namespace SIC_Debug
                         int memadd = Convert.ToInt32(Math.Ceiling(j / 2.0));
                         memory[modaddr + memadd] = result[Convert.ToInt32(Math.Ceiling(bytes / 2.0)) - memadd];
                     }
-                    /*
-                    memory[modaddr + 2] = result[0];
-                    memory[modaddr + 1] = result[1];
-                    memory[modaddr] = result[2];
-                     */
+
                     i++;
                 }
             }
@@ -435,9 +439,8 @@ namespace SIC_Debug
             }
         }
 
-        public bool Step()
+        private Instruction getInstruction()
         {
-            this.devicewrite = false;
             byte[] instruction = new byte[4];
             try
             {
@@ -447,10 +450,15 @@ namespace SIC_Debug
             catch (IndexOutOfRangeException)
             {
                 //TODO: handle instruction out of memory range.
-                return false;
+                return null;
             }
 
-            Instruction current = new Instruction(instruction);
+            return new Instruction(instruction);
+        }
+
+        public bool Step()
+        {
+            this.devicewrite = false;
             current.addrof = ProgramCounter;
             IncrementPC(current);
             if (current.twobyte)
@@ -599,11 +607,7 @@ namespace SIC_Debug
                 return false;
             }
 
-            if (lastInst.Count >= 15)
-            {
-                lastInst.Dequeue();
-            }
-            lastInst.Enqueue(current);
+            lastInstruction = current;
             return true;
         }
 
@@ -636,15 +640,13 @@ namespace SIC_Debug
             this.devicewrite = false;
             ProgramCounter = startingaddr;
             int currentaddr = startingaddr;
-            bool shouldbreak = false;
             int counter = 0;
             if (ProgramCounter > 32768 || ProgramCounter < 0)
             {
                 errors.Enqueue(string.Format("Error: Program Counter value 0x{0:X3} outside memory range.", ProgramCounter));
                 return false;
             }
-            BreakpointReached = false;
-            while (memory[ProgramCounter] != 0xFF)
+            while (true)
             {
                 counter++;
                 if (counter >= 50000)
@@ -653,21 +655,23 @@ namespace SIC_Debug
                     return false;
                 }
 
-
-                if (breakpoints.Contains(ProgramCounter) && shouldbreak)
-                {
-                    BreakpointReached = true;
+                current = getInstruction();
+                SICEvent instEvent = new SICEvent(current, ProgramCounter);
+                PreInstructionHook(instEvent);
+                if (!instEvent.Continue)
                     return true;
-                }
 
                 if (!Step())
                 {
                     errors.Enqueue(string.Format("Fatal error at location {0:X}{1}", ProgramCounter, Environment.NewLine));
                     return false;
                 }
-                shouldbreak = true;
+
+                instEvent = new SICEvent(lastInstruction, ProgramCounter);
+                PostInstructionHook(instEvent);
+                if (!instEvent.Continue)
+                    return true;
             }
-            return true;
         }
     }
 }

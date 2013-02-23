@@ -15,6 +15,8 @@ namespace SIC_Debug
     public partial class SicDBG : Form
     {
         SICVM vm;
+        List<int> Breakpoints = new List<int>();
+        Queue<Instruction> trace = new Queue<Instruction>();
 
         static List<char> HexChars = new List<char>(new char[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f', 'A', 'B', 'C', 'D', 'E', 'F', '\b' });
 
@@ -22,6 +24,9 @@ namespace SIC_Debug
         {
             InitializeComponent();
             vm = new SICVM();
+            vm.PreInstructionHook += new SICVM.PreInstruction(breakptHandler);
+            vm.PostInstructionHook += new SICVM.PostInstruction(traceHandler);
+            vm.PreInstructionHook += new SICVM.PreInstruction(stopOnFF);
         }
 
         private void btnLoad_Click(object sender, EventArgs e)
@@ -149,7 +154,8 @@ namespace SIC_Debug
                 }
                 else
                 {
-                    vm.Breakpoints.Add(newpt);
+                    Breakpoints.Add(newpt);
+                    //vm.Breakpoints.Add(newpt);
                     lstBkpt.Items.Add(string.Format("{0:X}", newpt));
                     tbBkPt.Text = "";
                 }
@@ -158,6 +164,30 @@ namespace SIC_Debug
             {
                 MessageBox.Show("Invalid address.");
             }
+        }
+
+        private void breakptHandler(SICEvent e)
+        {
+            if (Breakpoints.Contains(e.PC))
+            {
+                e.Continue = false;
+                string msgs = string.Format("Breakpoint reached at 0x{0:X4}.", vm.ProgramCounter);
+                tbRunAddr.Text = string.Format("{0:X}", vm.ProgramCounter);
+                OutputMemdump(Convert.ToInt32(tbStart.Text, 16), Convert.ToInt32(tbEnd.Text, 16), msgs);
+            }
+        }
+
+        private void traceHandler(SICEvent e)
+        {
+            if (trace.Count > 14)
+                trace.Dequeue();
+            trace.Enqueue(e.instruction);
+        }
+
+        private void stopOnFF(SICEvent e)
+        {
+            if (vm.Memory[e.PC] == 0xFF)
+                e.Continue = false;
         }
 
         private void btnRun_Click(object sender, EventArgs e)
@@ -182,11 +212,11 @@ namespace SIC_Debug
             string errorMsgs = "";
             while (vm.Errors.Count > 0) 
                 errorMsgs += vm.Errors.Dequeue() + System.Environment.NewLine;
-            if (vm.BreakpointReached)
+            /*if (vm.BreakpointReached)
                 errorMsgs += string.Format("Breakpoint reached at 0x{0:X4}.", vm.ProgramCounter);
             tbRunAddr.Text = string.Format("{0:X}", vm.ProgramCounter);
-            OutputMemdump(Convert.ToInt32(tbStart.Text, 16), Convert.ToInt32(tbEnd.Text, 16), errorMsgs);
-            foreach (Instruction instruction in vm.Stack)
+            OutputMemdump(Convert.ToInt32(tbStart.Text, 16), Convert.ToInt32(tbEnd.Text, 16), errorMsgs);*/
+            foreach (Instruction instruction in trace)
             {
                 lstInstructions.Items.Add(instruction);
             }
@@ -212,7 +242,8 @@ namespace SIC_Debug
             {
                 if (lstBkpt.SelectedIndex >= 0)
                 {
-                    vm.Breakpoints.Remove(Convert.ToInt32(lstBkpt.Items[lstBkpt.SelectedIndex].ToString(), 16));
+                    Breakpoints.Remove(Convert.ToInt32(lstBkpt.Items[lstBkpt.SelectedIndex].ToString(), 16));
+                    //vm.Breakpoints.Remove(Convert.ToInt32(lstBkpt.Items[lstBkpt.SelectedIndex].ToString(), 16));
                     lstBkpt.Items.RemoveAt(lstBkpt.SelectedIndex);
                 }
             }
@@ -237,12 +268,13 @@ namespace SIC_Debug
             if (vm.ProgramCounter == 0 && vm.ProgramCounter != Convert.ToInt32(tbRunAddr.Text, 16))
                 vm.ProgramCounter = Convert.ToInt32(tbRunAddr.Text, 16);
             vm.Step();
+            trace.Enqueue(vm.lastInstruction);
             tbRunAddr.Text = string.Format("{0:X}", vm.ProgramCounter);
             string errorMsgs = "";
             while (vm.Errors.Count > 0)
                 errorMsgs += vm.Errors.Dequeue() + System.Environment.NewLine;
             lstInstructions.Items.Clear();
-            foreach (Instruction instruction in vm.Stack)
+            foreach (Instruction instruction in trace)
             {
                 lstInstructions.Items.Add(instruction);
             }
