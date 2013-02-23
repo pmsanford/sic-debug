@@ -31,7 +31,6 @@ namespace SIC_Debug
 
         private byte[] memory;
         public Device[] devices; //TODO: This should be private.
-        private Queue<Instruction> lastInst;
         private Queue<String> errors;
         private bool devicewrite;
         public Instruction lastInstruction = null;
@@ -52,7 +51,6 @@ namespace SIC_Debug
             AllowWriting = false;
             memory = Enumerable.Repeat<byte>(0xFF, 1048575).ToArray<byte>(); // 1048575 bytes, 1Mb, is the memory range for XE machines.
             errors = new Queue<string>();
-            lastInst = new Queue<Instruction>();
             devices = new Device[7];
             for (int i = 0; i < devices.Length; i++)
             {
@@ -461,11 +459,6 @@ namespace SIC_Debug
             if (current.twobyte)
             {
                 DoTwoBye(current);
-                if (lastInst.Count >= 15 && Trace == TracingLevel.Partial)
-                {
-                    lastInst.Dequeue();
-                }
-                lastInst.Enqueue(current);
                 return true;
             }
 
