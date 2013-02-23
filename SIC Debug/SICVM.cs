@@ -26,12 +26,10 @@ namespace SIC_Debug
         public TracingLevel Trace { get; set; }
         public Queue<String> Errors { get { return errors; } }
         public Device[] Devices { get { return devices; } }
-        public bool BreakpointReached { get; set; }
         public byte[] Memory { get { return memory; } }
         public bool DeviceWritten { get { return devicewrite; } }
 
         private byte[] memory;
-        private List<int> breakpoints;
         public Device[] devices; //TODO: This should be private.
         private Queue<Instruction> lastInst;
         private Queue<String> errors;
@@ -51,7 +49,7 @@ namespace SIC_Debug
         {
             Trace = TracingLevel.Partial;
             RegisterA = RegisterB = RegisterX = RegisterS = RegisterL = RegisterT = ProgramCounter = StatusWord = 0;
-            AllowWriting = BreakpointReached = false;
+            AllowWriting = false;
             memory = Enumerable.Repeat<byte>(0xFF, 32768).ToArray<byte>(); // 32768 bytes, 32Kb, Beck p5
             errors = new Queue<string>();
             lastInst = new Queue<Instruction>();
@@ -60,7 +58,6 @@ namespace SIC_Debug
             {
                 devices[i] = new SimpleFileDevice();
             }
-            breakpoints = new List<int>();
             PreInstructionHook = null;
             PostInstructionHook = null;
         }
