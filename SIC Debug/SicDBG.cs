@@ -182,8 +182,6 @@ namespace SIC_Debug
 
         private void traceHandler(SICEvent e)
         {
-            if (trace.Count > 14)
-                trace.Dequeue();
             trace.Enqueue(e.instruction);
         }
 

@@ -50,7 +50,6 @@
             this.lstInstructions = new System.Windows.Forms.ListBox();
             this.label4 = new System.Windows.Forms.Label();
             this.btnStep = new System.Windows.Forms.Button();
-            this.cbFT = new System.Windows.Forms.CheckBox();
             this.button1 = new System.Windows.Forms.Button();
             this.btnLoadEXT = new System.Windows.Forms.Button();
             this.tbEnd = new System.Windows.Forms.TextBox();
@@ -285,17 +284,6 @@
             this.btnStep.UseVisualStyleBackColor = true;
             this.btnStep.Click += new System.EventHandler(this.btnStep_Click);
             // 
-            // cbFT
-            // 
-            this.cbFT.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.cbFT.AutoSize = true;
-            this.cbFT.Location = new System.Drawing.Point(613, 36);
-            this.cbFT.Name = "cbFT";
-            this.cbFT.Size = new System.Drawing.Size(73, 17);
-            this.cbFT.TabIndex = 16;
-            this.cbFT.Text = "Full Trace";
-            this.cbFT.UseVisualStyleBackColor = true;
-            // 
             // button1
             // 
             this.button1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
@@ -505,7 +493,6 @@
             this.Controls.Add(this.tbStart);
             this.Controls.Add(this.tbEnd);
             this.Controls.Add(this.button1);
-            this.Controls.Add(this.cbFT);
             this.Controls.Add(this.btnStep);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.lstInstructions);
@@ -554,7 +541,6 @@
         private System.Windows.Forms.ListBox lstInstructions;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Button btnStep;
-        private System.Windows.Forms.CheckBox cbFT;
         private System.Windows.Forms.ToolStripMenuItem allowWritingToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
         private System.Windows.Forms.ToolStripMenuItem clearMemoryToolStripMenuItem;
