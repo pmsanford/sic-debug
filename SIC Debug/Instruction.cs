@@ -26,6 +26,8 @@ namespace SIC_Debug
         public Register r1;
         public Register r2;
         public int addrof;
+        public int? calculatedaddr = null;
+        public int length;
 
         public Instruction(string instruction)
         {
@@ -58,6 +60,7 @@ namespace SIC_Debug
                 twobyte = true;
                 r1 = (Register)((inputbytes[1] & 0xF0) / 16);
                 r2 = (Register)(inputbytes[1] & 0x0F);
+                length = 2;
             }
             else
             {
@@ -68,6 +71,10 @@ namespace SIC_Debug
                 baserel = (inputbytes[1] & 0x40) > 0 ? true : false;
                 pcrel = (inputbytes[1] & 0x20) > 0 ? true : false;
                 extended = (inputbytes[1] & 0x10) > 0 ? true : false;
+                if (extended)
+                    length = 4;
+                else
+                    length = 3;
                 if (!indirect && !immediate) // Simple SIC instruction
                 {
                     baserel = false;

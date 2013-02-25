@@ -262,6 +262,7 @@
             this.lstInstructions.Name = "lstInstructions";
             this.lstInstructions.Size = new System.Drawing.Size(234, 446);
             this.lstInstructions.TabIndex = 13;
+            this.lstInstructions.SelectedIndexChanged += new System.EventHandler(this.lstInstructions_SelectedIndexChanged);
             // 
             // label4
             // 

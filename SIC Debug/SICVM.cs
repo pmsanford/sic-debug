@@ -483,6 +483,7 @@ namespace SIC_Debug
             int calcaddr, memval;
 
             calcaddr = GetAddress(current);
+            current.calculatedaddr = calcaddr;
             try
             {
                 memval = GetData(current);

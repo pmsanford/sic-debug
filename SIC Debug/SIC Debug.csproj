@@ -60,6 +60,7 @@
       <DependentUpon>Config.cs</DependentUpon>
     </Compile>
     <Compile Include="Device.cs" />
+    <Compile Include="Highlight.cs" />
     <Compile Include="MemoryByteProvider.cs" />
     <Compile Include="SICEvent.cs" />
     <Compile Include="SICWarning.cs" />

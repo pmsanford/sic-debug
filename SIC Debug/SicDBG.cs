@@ -24,7 +24,11 @@ namespace SIC_Debug
 
         long lastMemoryHighlight = -1;
 
-        List<int> activeHighlights = new List<int>();
+        Dictionary<int, Highlight> activeHighlights = new Dictionary<int, Highlight>();
+
+        Dictionary<int, Stack<Highlight>> oldHighlights = new Dictionary<int, Stack<Highlight>>();
+
+        int prevInstructionIndex = -1;
 
         public SicDBG()
         {
@@ -178,7 +182,7 @@ namespace SIC_Debug
 
         private void memoryChange(int address, int length)
         {
-            if (lastMemoryHighlight >= 0)
+            if (lastMemoryHighlight >= 0 && activeHighlights.Keys.Contains((int)lastMemoryHighlight))
                 resetColor((int)lastMemoryHighlight);
             lastMemoryHighlight = address;
             changeColor(address, length, Color.Red);
@@ -192,14 +196,44 @@ namespace SIC_Debug
 
         private void changeColor(int startAddress, int length, Color foreColor, Color backColor)
         {
+            Highlight newhl = new Highlight(startAddress, length, foreColor, backColor);
+
+            if (activeHighlights.Keys.Contains(startAddress))
+            {
+                pushColor(activeHighlights[startAddress]);
+                hbMemory.RemoveHighlight(startAddress);
+                hbMemory.Invalidate();
+            }
+
             hbMemory.AddHighlight(startAddress, length, foreColor, backColor);
-            activeHighlights.Add(startAddress);
+            activeHighlights.Add(startAddress, newhl);
+
+            hbMemory.Refresh();
+        }
+
+        private void pushColor(Highlight highlight)
+        {
+            if (!oldHighlights.Keys.Contains(highlight.Address))
+                oldHighlights.Add(highlight.Address, new Stack<Highlight>());
+
+            oldHighlights[highlight.Address].Push(highlight);
         }
 
         private void resetColor(int startAddress)
         {
             hbMemory.RemoveHighlight(startAddress);
             activeHighlights.Remove(startAddress);
+
+            if (oldHighlights.Keys.Contains(startAddress))
+            {
+                Highlight oldhl = oldHighlights[startAddress].Pop();
+                if (oldHighlights[startAddress].Count == 0)
+                    oldHighlights.Remove(startAddress);
+                hbMemory.AddHighlight(oldhl.Address, oldhl.Length, oldhl.ForeColor, oldhl.BackColor);
+                activeHighlights.Add(startAddress, oldhl);
+            }
+
+            hbMemory.Refresh();
         }
 
         private void btnRun_Click(object sender, EventArgs e)
@@ -391,6 +425,46 @@ namespace SIC_Debug
         }
 
         #endregion
+
+        private void lstInstructions_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (prevInstructionIndex >= 0)
+            {
+                Instruction prev = (Instruction)lstInstructions.Items[prevInstructionIndex];
+                if (activeHighlights.Keys.Contains(prev.addrof))
+                    resetColor(prev.addrof);
+                if (prev.calculatedaddr != null && activeHighlights.Keys.Contains((int)prev.calculatedaddr))
+                    resetColor((int)prev.calculatedaddr);
+            }
+
+            prevInstructionIndex = lstInstructions.SelectedIndex;
+            Instruction current = (Instruction)lstInstructions.Items[lstInstructions.SelectedIndex];
+            changeColor(current.addrof, current.length, Color.Black, Color.LightSkyBlue);
+            if (current.calculatedaddr != null && !(current.immediate && !current.indirect))
+            {
+                changeColor((int)current.calculatedaddr, getLengthOperatedOn(current.opcode), Color.Black, Color.LightGray);
+            }
+        }
+
+        private int getLengthOperatedOn(OpCode code)
+        {
+            switch (code) {
+                case OpCode.LDCH:
+                case OpCode.STCH:
+                case OpCode.TD:
+                case OpCode.WD:
+                case OpCode.RD:
+                    return 1;
+                case OpCode.J:
+                case OpCode.JEQ:
+                case OpCode.JLT:
+                case OpCode.JGT:
+                case OpCode.JSUB:
+                    return 1;
+                default:
+                    return 3;
+            }
+        }
     }
 
     public class DeviceNotInitialized : Exception
