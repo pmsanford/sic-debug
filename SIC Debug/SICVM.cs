@@ -38,10 +38,12 @@ namespace SIC_Debug
         public delegate void PreInstruction(SICEvent args);
         public delegate void PostInstruction(SICEvent args);
         public delegate void WarningHandler(SICWarning args);
+        public delegate void MemoryChanged(int address, int length);
 
         public PreInstruction PreInstructionHook;
         public PostInstruction PostInstructionHook;
         public WarningHandler WarningHook;
+        public MemoryChanged MemoryChangedHook;
 
         public SICVM()
         {
@@ -56,6 +58,7 @@ namespace SIC_Debug
             PreInstructionHook = null;
             PostInstructionHook = null;
             WarningHook = null;
+            MemoryChangedHook = null;
         }
 
         public Tuple<int, int> LoadXEObjectFile(string filecontents)
@@ -320,6 +323,7 @@ namespace SIC_Debug
             memory[address + 2] = strvalue[0];
             memory[address + 1] = strvalue[1];
             memory[address] = strvalue[2];
+            MemoryChangedHook(address, 3);
         }
 
         public void Comp(int lh, int rh)
@@ -576,6 +580,7 @@ namespace SIC_Debug
                     case OpCode.STCH:
                         byte[] regiA = BitConverter.GetBytes(RegisterA);
                         memory[calcaddr] = regiA[0];
+                        MemoryChangedHook(calcaddr, 1);
                         break;
                     case OpCode.RD:
                     case OpCode.TD:
