@@ -1098,6 +1098,8 @@ namespace Be.Windows.Forms
 		#endregion
 
 		#region Fields
+        HighlightCollection _highlights;
+
 		/// <summary>
 		/// Contains the hole content bounds of all text
 		/// </summary>
@@ -1390,6 +1392,8 @@ namespace Be.Windows.Forms
 
 			_thumbTrackTimer.Interval = 50;
 			_thumbTrackTimer.Tick += new EventHandler(PerformScrollThumbTrack);
+
+            _highlights = new HighlightCollection();
 		}
 
 		#endregion
@@ -1653,8 +1657,31 @@ namespace Be.Windows.Forms
 		}
 		#endregion
 
-		#region Selection methods
-		void ReleaseSelection()
+        #region Highlight methods
+
+        public void AddHighlight(long position, long length, Color foreColor, Color backColor)
+        {
+            if (this.ByteProvider == null)
+                throw new NullReferenceException("No data loaded into the control.");
+
+            if (position > this._byteProvider.Length || position + length > this._byteProvider.Length)
+                throw new ArgumentException("Position specified overflows length of the data.");
+
+            this._highlights.Add(position, length, foreColor, backColor);
+        }
+
+        public void RemoveHighlight(long position)
+        {
+            if (!this._highlights.ContainsKey(position))
+                throw new ArgumentException(string.Format("No highlight at position {0}.", position));
+
+            this._highlights.Remove(position);
+        }
+
+        #endregion
+
+        #region Selection methods
+        void ReleaseSelection()
 		{
 			System.Diagnostics.Debug.WriteLine("ReleaseSelection()", "HexBox");
 
@@ -2521,14 +2548,20 @@ namespace Be.Windows.Forms
 
 				bool isSelectedByte = i >= _bytePos && i <= (_bytePos + _selectionLength - 1) && _selectionLength != 0;
 
+                Highlight hl = this._highlights.getHighlight(i);
+
 				if (isSelectedByte && isKeyInterpreterActive)
 				{
 					PaintHexStringSelected(g, b, selBrush, selBrushBack, gridPoint);
 				}
-				else
-				{
-					PaintHexString(g, b, brush, gridPoint);
-				}
+                else if (hl != null)
+                {
+                    PaintHexStringSelected(g, b, hl.ForeBrush, hl.BackBrush, gridPoint);
+                }
+                else
+                {
+                    PaintHexString(g, b, brush, gridPoint);
+                }
 
 				string s = new String(ByteCharConverter.ToChar(b), 1);
 

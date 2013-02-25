@@ -22,6 +22,10 @@ namespace SIC_Debug
 
         static List<char> HexChars = new List<char>(new char[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f', 'A', 'B', 'C', 'D', 'E', 'F', '\b' });
 
+        long lastMemoryHighlight = -1;
+
+        List<int> activeHighlights = new List<int>();
+
         public SicDBG()
         {
             InitializeComponent();
@@ -174,7 +178,28 @@ namespace SIC_Debug
 
         private void memoryChange(int address, int length)
         {
+            if (lastMemoryHighlight >= 0)
+                resetColor((int)lastMemoryHighlight);
+            lastMemoryHighlight = address;
+            changeColor(address, length, Color.Red);
             hbMemory.Refresh();
+        }
+
+        private void changeColor(int startAddress, int length, Color foreColor)
+        {
+            changeColor(startAddress, length, foreColor, Color.White);
+        }
+
+        private void changeColor(int startAddress, int length, Color foreColor, Color backColor)
+        {
+            hbMemory.AddHighlight(startAddress, length, foreColor, backColor);
+            activeHighlights.Add(startAddress);
+        }
+
+        private void resetColor(int startAddress)
+        {
+            hbMemory.RemoveHighlight(startAddress);
+            activeHighlights.Remove(startAddress);
         }
 
         private void btnRun_Click(object sender, EventArgs e)

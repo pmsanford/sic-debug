@@ -146,6 +146,8 @@
     </Compile>
     <Compile Include="HexCasing.cs" />
     <Compile Include="ByteCharConverters.cs" />
+    <Compile Include="Highlight.cs" />
+    <Compile Include="HighlightCollection.cs" />
     <Compile Include="IByteProvider.cs">
       <SubType>Code</SubType>
     </Compile>
