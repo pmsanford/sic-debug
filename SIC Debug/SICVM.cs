@@ -40,10 +40,10 @@ namespace SIC_Debug
         public delegate void WarningHandler(SICWarning args);
         public delegate void MemoryChanged(int address, int length);
 
-        public PreInstruction PreInstructionHook;
-        public PostInstruction PostInstructionHook;
-        public WarningHandler WarningHook;
-        public MemoryChanged MemoryChangedHook;
+        public event PreInstruction PreInstructionHook;
+        public event PostInstruction PostInstructionHook;
+        public event WarningHandler WarningHook;
+        public event MemoryChanged MemoryChangedHook;
 
         public SICVM()
         {
@@ -323,7 +323,8 @@ namespace SIC_Debug
             memory[address + 2] = strvalue[0];
             memory[address + 1] = strvalue[1];
             memory[address] = strvalue[2];
-            MemoryChangedHook(address, 3);
+            if (MemoryChangedHook != null)
+                MemoryChangedHook(address, 3);
         }
 
         public void Comp(int lh, int rh)

@@ -40,7 +40,7 @@
             this.tbRunAddr = new System.Windows.Forms.TextBox();
             this.btnView = new System.Windows.Forms.Button();
             this.label3 = new System.Windows.Forms.Label();
-            this.menuStrip1 = new System.Windows.Forms.MenuStrip();
+            this.mnuMain = new System.Windows.Forms.MenuStrip();
             this.filesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.openFilesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.allowWritingToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -70,26 +70,26 @@
             this.tbSW = new System.Windows.Forms.TextBox();
             this.label11 = new System.Windows.Forms.Label();
             this.label12 = new System.Windows.Forms.Label();
-            this.menuStrip1.SuspendLayout();
+            this.hbMemory = new Be.Windows.Forms.HexBox();
+            this.mnuMain.SuspendLayout();
             this.SuspendLayout();
             // 
             // tbOutput
             // 
-            this.tbOutput.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
+            this.tbOutput.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.tbOutput.Font = new System.Drawing.Font("Consolas", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.tbOutput.Location = new System.Drawing.Point(12, 109);
+            this.tbOutput.Location = new System.Drawing.Point(12, 415);
             this.tbOutput.Multiline = true;
             this.tbOutput.Name = "tbOutput";
             this.tbOutput.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.tbOutput.Size = new System.Drawing.Size(359, 242);
+            this.tbOutput.Size = new System.Drawing.Size(579, 74);
             this.tbOutput.TabIndex = 0;
             // 
             // btnLoad
             // 
             this.btnLoad.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnLoad.Location = new System.Drawing.Point(377, 28);
+            this.btnLoad.Location = new System.Drawing.Point(597, 28);
             this.btnLoad.Name = "btnLoad";
             this.btnLoad.Size = new System.Drawing.Size(75, 23);
             this.btnLoad.TabIndex = 1;
@@ -118,7 +118,7 @@
             // btnBkPt
             // 
             this.btnBkPt.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnBkPt.Location = new System.Drawing.Point(377, 217);
+            this.btnBkPt.Location = new System.Drawing.Point(597, 217);
             this.btnBkPt.Name = "btnBkPt";
             this.btnBkPt.Size = new System.Drawing.Size(75, 23);
             this.btnBkPt.TabIndex = 4;
@@ -129,7 +129,7 @@
             // tbBkPt
             // 
             this.tbBkPt.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.tbBkPt.Location = new System.Drawing.Point(377, 191);
+            this.tbBkPt.Location = new System.Drawing.Point(597, 191);
             this.tbBkPt.Name = "tbBkPt";
             this.tbBkPt.Size = new System.Drawing.Size(75, 20);
             this.tbBkPt.TabIndex = 5;
@@ -139,15 +139,15 @@
             this.lstBkpt.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.lstBkpt.FormattingEnabled = true;
-            this.lstBkpt.Location = new System.Drawing.Point(377, 246);
+            this.lstBkpt.Location = new System.Drawing.Point(597, 246);
             this.lstBkpt.Name = "lstBkpt";
-            this.lstBkpt.Size = new System.Drawing.Size(75, 108);
+            this.lstBkpt.Size = new System.Drawing.Size(75, 238);
             this.lstBkpt.TabIndex = 6;
             // 
             // btnDelPt
             // 
             this.btnDelPt.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnDelPt.Location = new System.Drawing.Point(377, 360);
+            this.btnDelPt.Location = new System.Drawing.Point(597, 498);
             this.btnDelPt.Name = "btnDelPt";
             this.btnDelPt.Size = new System.Drawing.Size(75, 23);
             this.btnDelPt.TabIndex = 7;
@@ -158,7 +158,7 @@
             // btnRun
             // 
             this.btnRun.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnRun.Location = new System.Drawing.Point(377, 135);
+            this.btnRun.Location = new System.Drawing.Point(597, 135);
             this.btnRun.Name = "btnRun";
             this.btnRun.Size = new System.Drawing.Size(75, 23);
             this.btnRun.TabIndex = 8;
@@ -169,7 +169,7 @@
             // tbRunAddr
             // 
             this.tbRunAddr.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.tbRunAddr.Location = new System.Drawing.Point(377, 109);
+            this.tbRunAddr.Location = new System.Drawing.Point(597, 109);
             this.tbRunAddr.Name = "tbRunAddr";
             this.tbRunAddr.Size = new System.Drawing.Size(75, 20);
             this.tbRunAddr.TabIndex = 9;
@@ -189,22 +189,22 @@
             // 
             this.label3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(378, 90);
+            this.label3.Location = new System.Drawing.Point(598, 90);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(47, 13);
             this.label3.TabIndex = 11;
             this.label3.Text = "Entry Pt:";
             // 
-            // menuStrip1
+            // mnuMain
             // 
-            this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.mnuMain.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.filesToolStripMenuItem,
             this.helpToolStripMenuItem});
-            this.menuStrip1.Location = new System.Drawing.Point(0, 0);
-            this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(706, 24);
-            this.menuStrip1.TabIndex = 12;
-            this.menuStrip1.Text = "menuStrip1";
+            this.mnuMain.Location = new System.Drawing.Point(0, 0);
+            this.mnuMain.Name = "mnuMain";
+            this.mnuMain.Size = new System.Drawing.Size(926, 24);
+            this.mnuMain.TabIndex = 12;
+            this.mnuMain.Text = "menuStrip1";
             // 
             // filesToolStripMenuItem
             // 
@@ -258,16 +258,16 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.lstInstructions.Font = new System.Drawing.Font("Consolas", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lstInstructions.FormattingEnabled = true;
-            this.lstInstructions.Location = new System.Drawing.Point(459, 56);
+            this.lstInstructions.Location = new System.Drawing.Point(679, 56);
             this.lstInstructions.Name = "lstInstructions";
-            this.lstInstructions.Size = new System.Drawing.Size(234, 316);
+            this.lstInstructions.Size = new System.Drawing.Size(234, 446);
             this.lstInstructions.TabIndex = 13;
             // 
             // label4
             // 
             this.label4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(458, 40);
+            this.label4.Location = new System.Drawing.Point(678, 40);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(86, 13);
             this.label4.TabIndex = 14;
@@ -276,7 +276,7 @@
             // btnStep
             // 
             this.btnStep.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnStep.Location = new System.Drawing.Point(377, 165);
+            this.btnStep.Location = new System.Drawing.Point(597, 165);
             this.btnStep.Name = "btnStep";
             this.btnStep.Size = new System.Drawing.Size(75, 23);
             this.btnStep.TabIndex = 15;
@@ -287,7 +287,7 @@
             // button1
             // 
             this.button1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.button1.Location = new System.Drawing.Point(12, 357);
+            this.button1.Location = new System.Drawing.Point(12, 495);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(75, 23);
             this.button1.TabIndex = 17;
@@ -298,7 +298,7 @@
             // btnLoadEXT
             // 
             this.btnLoadEXT.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnLoadEXT.Location = new System.Drawing.Point(377, 57);
+            this.btnLoadEXT.Location = new System.Drawing.Point(597, 57);
             this.btnLoadEXT.Name = "btnLoadEXT";
             this.btnLoadEXT.Size = new System.Drawing.Size(75, 23);
             this.btnLoadEXT.TabIndex = 1;
@@ -469,11 +469,30 @@
             this.label12.TabIndex = 19;
             this.label12.Text = "Status Word:";
             // 
+            // hbMemory
+            // 
+            this.hbMemory.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.hbMemory.ColumnInfoVisible = true;
+            this.hbMemory.Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.hbMemory.InfoForeColor = System.Drawing.Color.Gray;
+            this.hbMemory.LineInfoVisible = true;
+            this.hbMemory.Location = new System.Drawing.Point(15, 111);
+            this.hbMemory.Name = "hbMemory";
+            this.hbMemory.ShadowSelectionColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(60)))), ((int)(((byte)(188)))), ((int)(((byte)(255)))));
+            this.hbMemory.Size = new System.Drawing.Size(576, 298);
+            this.hbMemory.StringViewVisible = true;
+            this.hbMemory.TabIndex = 20;
+            this.hbMemory.UseFixedBytesPerLine = true;
+            this.hbMemory.VScrollBarVisible = true;
+            // 
             // SicDBG
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(706, 388);
+            this.ClientSize = new System.Drawing.Size(926, 526);
+            this.Controls.Add(this.hbMemory);
             this.Controls.Add(this.label12);
             this.Controls.Add(this.label10);
             this.Controls.Add(this.label11);
@@ -509,13 +528,13 @@
             this.Controls.Add(this.btnLoadEXT);
             this.Controls.Add(this.btnLoad);
             this.Controls.Add(this.tbOutput);
-            this.Controls.Add(this.menuStrip1);
-            this.MainMenuStrip = this.menuStrip1;
+            this.Controls.Add(this.mnuMain);
+            this.MainMenuStrip = this.mnuMain;
             this.MinimumSize = new System.Drawing.Size(722, 426);
             this.Name = "SicDBG";
             this.Text = "SIC Debug";
-            this.menuStrip1.ResumeLayout(false);
-            this.menuStrip1.PerformLayout();
+            this.mnuMain.ResumeLayout(false);
+            this.mnuMain.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -535,7 +554,7 @@
         private System.Windows.Forms.TextBox tbRunAddr;
         private System.Windows.Forms.Button btnView;
         private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.MenuStrip menuStrip1;
+        private System.Windows.Forms.MenuStrip mnuMain;
         private System.Windows.Forms.ToolStripMenuItem filesToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem openFilesToolStripMenuItem;
         private System.Windows.Forms.ListBox lstInstructions;
@@ -565,6 +584,7 @@
         private System.Windows.Forms.TextBox tbSW;
         private System.Windows.Forms.Label label11;
         private System.Windows.Forms.Label label12;
+        private Be.Windows.Forms.HexBox hbMemory;
     }
 }
 

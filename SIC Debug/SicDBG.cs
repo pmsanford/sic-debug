@@ -29,6 +29,10 @@ namespace SIC_Debug
             vm.PreInstructionHook += new SICVM.PreInstruction(breakptHandler);
             vm.PostInstructionHook += new SICVM.PostInstruction(traceHandler);
             vm.PreInstructionHook += new SICVM.PreInstruction(stopOnFF);
+            hbMemory.ByteProvider = new MemoryByteProvider(vm.Memory);
+            hbMemory.SelectionForeColor = Color.White;
+            hbMemory.SelectionBackColor = Color.Blue;
+            vm.MemoryChangedHook += new SICVM.MemoryChanged(memoryChange);
         }
 
         private void btnLoad_Click(object sender, EventArgs e)
@@ -65,7 +69,9 @@ namespace SIC_Debug
                 OutputMemdump(addresses.Item1, endaddr);
 
                 tbOutput.Text += System.Environment.NewLine;
-                
+
+                hbMemory.Refresh();
+                hbMemory.ScrollByteIntoView(addresses.Item1);
             }
         }
 
@@ -110,34 +116,7 @@ namespace SIC_Debug
                 outstr.AppendFormat("Note: Allow write not checked, but WD encountered. Output file not written to.{0}", Environment.NewLine);
                 newlines++;
             }
-            outstr.AppendFormat("{0,6}   0 1 2 3  4 5 6 7  8 9 A B  C D E F{1}", "Addr", Environment.NewLine);
-            for (int i = start; i <= end; i++)
-            {
-                int beginaddr = i;
-                int endaddr = beginaddr + 4;
-                outstr.AppendFormat("0x{0:X4}: ", beginaddr);
-                for (int k = 0; k < 4; k++)
-                {
-                    for (int j = beginaddr; j < endaddr; j++)
-                    {
-                        outstr.AppendFormat("{0:X2}", memory[j]);
-                    }
-                    outstr.Append(" ");
-                    beginaddr = endaddr;
-                    endaddr = beginaddr + 4;
-                }
-                outstr.Append(Environment.NewLine);
-                i += 15;
-                newlines++;
-                if (newlines == 22)
-                {
-                    topofdump = outstr.Length;
-                }
-            }
 
-            outstr.Append(Environment.NewLine);
-            outstr.Append(Environment.NewLine);
-            outstr.Append(Environment.NewLine);
             tbOutput.Text = outstr.ToString();
             tbOutput.SelectionStart = newlines >= 18 ? (topofdump - 1) : tbOutput.Text.Length;
             tbOutput.ScrollToCaret();
@@ -174,6 +153,8 @@ namespace SIC_Debug
                 e.Continue = false;
                 messages.Enqueue(string.Format("Breakpoint reached at 0x{0:X4}.", vm.ProgramCounter));
                 tbRunAddr.Text = string.Format("{0:X}", vm.ProgramCounter);
+                hbMemory.Refresh();
+                hbMemory.ScrollByteIntoView(vm.ProgramCounter);
                 lastBP = e.PC;
             }
             else if (lastBP != null)
@@ -189,6 +170,11 @@ namespace SIC_Debug
         {
             if (vm.Memory[e.PC] == 0xFF)
                 e.Continue = false;
+        }
+
+        private void memoryChange(int address, int length)
+        {
+            hbMemory.Refresh();
         }
 
         private void btnRun_Click(object sender, EventArgs e)
@@ -365,6 +351,9 @@ namespace SIC_Debug
                 OutputMemdump(addresses.Item1, endaddr);
 
                 tbOutput.Text += System.Environment.NewLine;
+
+                hbMemory.Refresh();
+                hbMemory.ScrollByteIntoView(addresses.Item1);
             }
         }
 
