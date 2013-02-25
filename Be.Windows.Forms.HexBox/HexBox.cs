@@ -2475,12 +2475,18 @@ namespace Be.Windows.Forms
 				Point gridPoint = GetGridBytePoint(counter);
 				byte b = _byteProvider.ReadByte(i);
 
-				bool isSelectedByte = i >= _bytePos && i <= (_bytePos + _selectionLength - 1) && _selectionLength != 0;
+                bool isSelectedByte = i >= _bytePos && i <= (_bytePos + _selectionLength - 1) && _selectionLength != 0;
+
+                Highlight hl = this._highlights.getHighlight(i);
 
 				if (isSelectedByte && isKeyInterpreterActive)
 				{
 					PaintHexStringSelected(g, b, selBrush, selBrushBack, gridPoint);
-				}
+                }
+                else if (hl != null)
+                {
+                    PaintHexStringSelected(g, b, hl.ForeBrush, hl.BackBrush, gridPoint);
+                }
 				else
 				{
 					PaintHexString(g, b, brush, gridPoint);
