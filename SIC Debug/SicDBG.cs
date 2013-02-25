@@ -162,11 +162,15 @@ namespace SIC_Debug
                 messages.Enqueue(string.Format("Breakpoint reached at 0x{0:X4}.", vm.ProgramCounter));
                 tbRunAddr.Text = string.Format("{0:X}", vm.ProgramCounter);
                 hbMemory.Refresh();
-                hbMemory.ScrollByteIntoView(vm.ProgramCounter);
+                hbMemory.ScrollByteIntoView(e.PC);
+                changeColor(e.PC, e.instruction.length, Color.White, Color.DarkRed);
                 lastBP = e.PC;
             }
             else if (lastBP != null)
+            {
+                resetColor((int)lastBP);
                 lastBP = null;
+            }
         }
 
         private void traceHandler(SICEvent e)
@@ -217,6 +221,7 @@ namespace SIC_Debug
                 oldHighlights.Add(highlight.Address, new Stack<Highlight>());
 
             oldHighlights[highlight.Address].Push(highlight);
+            activeHighlights.Remove(highlight.Address);
         }
 
         private void resetColor(int startAddress)
