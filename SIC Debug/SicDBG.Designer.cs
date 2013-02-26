@@ -30,15 +30,12 @@
         {
             this.tbOutput = new System.Windows.Forms.TextBox();
             this.btnLoad = new System.Windows.Forms.Button();
-            this.label1 = new System.Windows.Forms.Label();
-            this.label2 = new System.Windows.Forms.Label();
             this.btnBkPt = new System.Windows.Forms.Button();
             this.tbBkPt = new System.Windows.Forms.TextBox();
             this.lstBkpt = new System.Windows.Forms.ListBox();
             this.btnDelPt = new System.Windows.Forms.Button();
             this.btnRun = new System.Windows.Forms.Button();
             this.tbRunAddr = new System.Windows.Forms.TextBox();
-            this.btnView = new System.Windows.Forms.Button();
             this.label3 = new System.Windows.Forms.Label();
             this.mnuMain = new System.Windows.Forms.MenuStrip();
             this.filesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -52,8 +49,6 @@
             this.btnStep = new System.Windows.Forms.Button();
             this.button1 = new System.Windows.Forms.Button();
             this.btnLoadEXT = new System.Windows.Forms.Button();
-            this.tbEnd = new System.Windows.Forms.TextBox();
-            this.tbStart = new System.Windows.Forms.TextBox();
             this.tbRegA = new System.Windows.Forms.TextBox();
             this.tbRegB = new System.Windows.Forms.TextBox();
             this.tbRegX = new System.Windows.Forms.TextBox();
@@ -96,24 +91,6 @@
             this.btnLoad.Text = "Load";
             this.btnLoad.UseVisualStyleBackColor = true;
             this.btnLoad.Click += new System.EventHandler(this.btnLoad_Click);
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(12, 33);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(71, 13);
-            this.label1.TabIndex = 3;
-            this.label1.Text = "Start Addr: 0x";
-            // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(164, 33);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(68, 13);
-            this.label2.TabIndex = 3;
-            this.label2.Text = "End Addr: 0x";
             // 
             // btnBkPt
             // 
@@ -174,16 +151,6 @@
             this.tbRunAddr.Size = new System.Drawing.Size(75, 20);
             this.tbRunAddr.TabIndex = 9;
             this.tbRunAddr.Text = "0";
-            // 
-            // btnView
-            // 
-            this.btnView.Location = new System.Drawing.Point(296, 28);
-            this.btnView.Name = "btnView";
-            this.btnView.Size = new System.Drawing.Size(75, 23);
-            this.btnView.TabIndex = 10;
-            this.btnView.Text = "View";
-            this.btnView.UseVisualStyleBackColor = true;
-            this.btnView.Click += new System.EventHandler(this.btnView_Click);
             // 
             // label3
             // 
@@ -307,28 +274,9 @@
             this.btnLoadEXT.UseVisualStyleBackColor = true;
             this.btnLoadEXT.Click += new System.EventHandler(this.btnLoadEXT_Click);
             // 
-            // tbEnd
-            // 
-            this.tbEnd.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper;
-            this.tbEnd.Location = new System.Drawing.Point(229, 30);
-            this.tbEnd.Name = "tbEnd";
-            this.tbEnd.Size = new System.Drawing.Size(61, 20);
-            this.tbEnd.TabIndex = 2;
-            this.tbEnd.Text = "0";
-            // 
-            // tbStart
-            // 
-            this.tbStart.Location = new System.Drawing.Point(79, 30);
-            this.tbStart.MaxLength = 4;
-            this.tbStart.Name = "tbStart";
-            this.tbStart.Size = new System.Drawing.Size(61, 20);
-            this.tbStart.TabIndex = 2;
-            this.tbStart.Text = "0";
-            this.tbStart.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.hexinput_KeyPress);
-            // 
             // tbRegA
             // 
-            this.tbRegA.Location = new System.Drawing.Point(33, 59);
+            this.tbRegA.Location = new System.Drawing.Point(33, 25);
             this.tbRegA.Name = "tbRegA";
             this.tbRegA.ReadOnly = true;
             this.tbRegA.Size = new System.Drawing.Size(45, 20);
@@ -337,7 +285,7 @@
             // 
             // tbRegB
             // 
-            this.tbRegB.Location = new System.Drawing.Point(107, 59);
+            this.tbRegB.Location = new System.Drawing.Point(107, 25);
             this.tbRegB.Name = "tbRegB";
             this.tbRegB.ReadOnly = true;
             this.tbRegB.Size = new System.Drawing.Size(45, 20);
@@ -346,7 +294,7 @@
             // 
             // tbRegX
             // 
-            this.tbRegX.Location = new System.Drawing.Point(181, 59);
+            this.tbRegX.Location = new System.Drawing.Point(181, 25);
             this.tbRegX.Name = "tbRegX";
             this.tbRegX.ReadOnly = true;
             this.tbRegX.Size = new System.Drawing.Size(45, 20);
@@ -356,7 +304,7 @@
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(12, 62);
+            this.label5.Location = new System.Drawing.Point(12, 28);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(17, 13);
             this.label5.TabIndex = 19;
@@ -365,7 +313,7 @@
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(84, 62);
+            this.label6.Location = new System.Drawing.Point(84, 28);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(17, 13);
             this.label6.TabIndex = 19;
@@ -374,7 +322,7 @@
             // label7
             // 
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(158, 62);
+            this.label7.Location = new System.Drawing.Point(158, 28);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(17, 13);
             this.label7.TabIndex = 19;
@@ -382,7 +330,7 @@
             // 
             // tbRegL
             // 
-            this.tbRegL.Location = new System.Drawing.Point(33, 85);
+            this.tbRegL.Location = new System.Drawing.Point(33, 51);
             this.tbRegL.Name = "tbRegL";
             this.tbRegL.ReadOnly = true;
             this.tbRegL.Size = new System.Drawing.Size(45, 20);
@@ -391,7 +339,7 @@
             // 
             // tbRegS
             // 
-            this.tbRegS.Location = new System.Drawing.Point(107, 85);
+            this.tbRegS.Location = new System.Drawing.Point(107, 51);
             this.tbRegS.Name = "tbRegS";
             this.tbRegS.ReadOnly = true;
             this.tbRegS.Size = new System.Drawing.Size(45, 20);
@@ -400,7 +348,7 @@
             // 
             // tbRegT
             // 
-            this.tbRegT.Location = new System.Drawing.Point(181, 85);
+            this.tbRegT.Location = new System.Drawing.Point(181, 51);
             this.tbRegT.Name = "tbRegT";
             this.tbRegT.ReadOnly = true;
             this.tbRegT.Size = new System.Drawing.Size(45, 20);
@@ -410,7 +358,7 @@
             // label8
             // 
             this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(12, 88);
+            this.label8.Location = new System.Drawing.Point(12, 54);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(16, 13);
             this.label8.TabIndex = 19;
@@ -419,7 +367,7 @@
             // label9
             // 
             this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(84, 88);
+            this.label9.Location = new System.Drawing.Point(84, 54);
             this.label9.Name = "label9";
             this.label9.Size = new System.Drawing.Size(17, 13);
             this.label9.TabIndex = 19;
@@ -428,7 +376,7 @@
             // label10
             // 
             this.label10.AutoSize = true;
-            this.label10.Location = new System.Drawing.Point(158, 88);
+            this.label10.Location = new System.Drawing.Point(158, 54);
             this.label10.Name = "label10";
             this.label10.Size = new System.Drawing.Size(17, 13);
             this.label10.TabIndex = 19;
@@ -436,7 +384,7 @@
             // 
             // tbPC
             // 
-            this.tbPC.Location = new System.Drawing.Point(326, 59);
+            this.tbPC.Location = new System.Drawing.Point(326, 25);
             this.tbPC.Name = "tbPC";
             this.tbPC.ReadOnly = true;
             this.tbPC.Size = new System.Drawing.Size(45, 20);
@@ -445,7 +393,7 @@
             // 
             // tbSW
             // 
-            this.tbSW.Location = new System.Drawing.Point(315, 85);
+            this.tbSW.Location = new System.Drawing.Point(315, 51);
             this.tbSW.Name = "tbSW";
             this.tbSW.ReadOnly = true;
             this.tbSW.Size = new System.Drawing.Size(56, 20);
@@ -455,7 +403,7 @@
             // label11
             // 
             this.label11.AutoSize = true;
-            this.label11.Location = new System.Drawing.Point(231, 62);
+            this.label11.Location = new System.Drawing.Point(231, 28);
             this.label11.Name = "label11";
             this.label11.Size = new System.Drawing.Size(89, 13);
             this.label11.TabIndex = 19;
@@ -464,7 +412,7 @@
             // label12
             // 
             this.label12.AutoSize = true;
-            this.label12.Location = new System.Drawing.Point(240, 88);
+            this.label12.Location = new System.Drawing.Point(240, 54);
             this.label12.Name = "label12";
             this.label12.Size = new System.Drawing.Size(69, 13);
             this.label12.TabIndex = 19;
@@ -479,10 +427,10 @@
             this.hbMemory.Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.hbMemory.InfoForeColor = System.Drawing.Color.Gray;
             this.hbMemory.LineInfoVisible = true;
-            this.hbMemory.Location = new System.Drawing.Point(15, 111);
+            this.hbMemory.Location = new System.Drawing.Point(15, 77);
             this.hbMemory.Name = "hbMemory";
             this.hbMemory.ShadowSelectionColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(60)))), ((int)(((byte)(188)))), ((int)(((byte)(255)))));
-            this.hbMemory.Size = new System.Drawing.Size(576, 298);
+            this.hbMemory.Size = new System.Drawing.Size(576, 332);
             this.hbMemory.StringViewVisible = true;
             this.hbMemory.TabIndex = 20;
             this.hbMemory.UseFixedBytesPerLine = true;
@@ -510,22 +458,17 @@
             this.Controls.Add(this.tbRegB);
             this.Controls.Add(this.tbRegL);
             this.Controls.Add(this.tbRegA);
-            this.Controls.Add(this.tbStart);
-            this.Controls.Add(this.tbEnd);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.btnStep);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.lstInstructions);
             this.Controls.Add(this.label3);
-            this.Controls.Add(this.btnView);
             this.Controls.Add(this.tbRunAddr);
             this.Controls.Add(this.btnRun);
             this.Controls.Add(this.btnDelPt);
             this.Controls.Add(this.lstBkpt);
             this.Controls.Add(this.tbBkPt);
             this.Controls.Add(this.btnBkPt);
-            this.Controls.Add(this.label2);
-            this.Controls.Add(this.label1);
             this.Controls.Add(this.btnLoadEXT);
             this.Controls.Add(this.btnLoad);
             this.Controls.Add(this.tbOutput);
@@ -545,15 +488,12 @@
 
         private System.Windows.Forms.TextBox tbOutput;
         private System.Windows.Forms.Button btnLoad;
-        private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Button btnBkPt;
         private System.Windows.Forms.TextBox tbBkPt;
         private System.Windows.Forms.ListBox lstBkpt;
         private System.Windows.Forms.Button btnDelPt;
         private System.Windows.Forms.Button btnRun;
         private System.Windows.Forms.TextBox tbRunAddr;
-        private System.Windows.Forms.Button btnView;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.MenuStrip mnuMain;
         private System.Windows.Forms.ToolStripMenuItem filesToolStripMenuItem;
@@ -567,8 +507,6 @@
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.ToolStripMenuItem helpToolStripMenuItem;
         private System.Windows.Forms.Button btnLoadEXT;
-        private System.Windows.Forms.TextBox tbEnd;
-        private System.Windows.Forms.TextBox tbStart;
         private System.Windows.Forms.TextBox tbRegA;
         private System.Windows.Forms.TextBox tbRegB;
         private System.Windows.Forms.TextBox tbRegX;

@@ -70,11 +70,9 @@ namespace SIC_Debug
                     tbOutput.Text += string.Format("Loaded code covers more than 20 lines, showing first 20. You can show more above.{0}", Environment.NewLine);
                     endaddr = addresses.Item1 + 0x130;
                 }
-                tbStart.Text = string.Format("{0:X}", addresses.Item1);
-                tbEnd.Text = string.Format("{0:X}", endaddr);
                 tbRunAddr.Text = string.Format("{0:X}", addresses.Item1);
 
-                OutputMemdump(addresses.Item1, endaddr);
+                OutputMemdump();
 
                 tbOutput.Text += System.Environment.NewLine;
 
@@ -85,17 +83,7 @@ namespace SIC_Debug
 
         public void OutputMemdump()
         {
-            OutputMemdump(Convert.ToInt32(tbStart.Text, 16), Convert.ToInt32(tbEnd.Text, 16), "");
-        }
-
-        public void OutputMemdump(int start, int end)
-        {
-            OutputMemdump(start, end, "");
-        }
-
-        public void OutputMemdump(string ErrorMsgs)
-        {
-            OutputMemdump(Convert.ToInt32(tbStart.Text, 16), Convert.ToInt32(tbEnd.Text, 16), ErrorMsgs);
+            OutputMemdump("");
         }
 
         public int CountNewlines(string input)
@@ -111,7 +99,7 @@ namespace SIC_Debug
             return count;
         }
 
-        public void OutputMemdump(int start, int end, string ErrorMsgs)
+        public void OutputMemdump(string ErrorMsgs)
         {
             StringBuilder outstr = new StringBuilder(tbOutput.Text);
             int topofdump = tbOutput.Text.Length;
@@ -272,7 +260,7 @@ namespace SIC_Debug
 
             builder.AppendLine(memmsg);
 
-            OutputMemdump(Convert.ToInt32(tbStart.Text, 16), Convert.ToInt32(tbEnd.Text, 16), builder.ToString());
+            OutputMemdump(builder.ToString());
 
             foreach (Instruction instruction in trace)
             {
@@ -365,8 +353,6 @@ namespace SIC_Debug
             {
                 vm.ClearMemory();
                 tbRunAddr.Text = "0";
-                tbStart.Text = "0";
-                tbEnd.Text = "0";
             }
         }
 
@@ -408,11 +394,9 @@ namespace SIC_Debug
                     tbOutput.Text += string.Format("Loaded code covers more than 20 lines, showing first 20. You can show more above.{0}", Environment.NewLine);
                     endaddr = addresses.Item1 + 0x130;
                 }
-                tbStart.Text = string.Format("{0:X}", addresses.Item1);
-                tbEnd.Text = string.Format("{0:X}", endaddr);
                 tbRunAddr.Text = string.Format("{0:X}", addresses.Item1);
 
-                OutputMemdump(addresses.Item1, endaddr);
+                OutputMemdump();
 
                 tbOutput.Text += System.Environment.NewLine;
 
