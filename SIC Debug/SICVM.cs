@@ -88,7 +88,7 @@ namespace SIC_Debug
                     }
                     if (line[0] == 'D')
                     {
-                        extab.Add(line.Substring(1, 6), Convert.ToInt32(line.Substring(7, 6), 16) + startaddr);
+                        extab.Add(line.Substring(1, 6).TrimEnd(), Convert.ToInt32(line.Substring(7, 6), 16) + startaddr);
                         for (int k = 13; k < line.Length; k += 12)
                         {
                             if (line.Substring(k).Length <= 12)
