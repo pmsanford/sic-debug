@@ -135,10 +135,10 @@ namespace SIC_Debug
                 }
                 while (lines[i][0] == 'M')
                 {
-                    int modaddr = Convert.ToInt32(lines[i].Substring(1, 6), 16) + startaddr;
+                    int modaddr = Convert.ToInt32(lines[i].Substring(1, 6), 16) + startaddr - 1;
                     int bytes = Convert.ToInt32(lines[i].Substring(7, 2), 16);
                     uint mask = bytes > 0 ? (uint)15 : 0;
-                    for (int j = 0; j < bytes; j++)
+                    for (int j = 1; j < bytes; j++)
                     {
                         mask = mask << 4;
                         mask += 15;
@@ -146,7 +146,7 @@ namespace SIC_Debug
                     char op = lines[i][9];
                     string symbol = lines[i].Substring(10);
                     List<byte> membytes = new List<byte>();
-                    for (int j = bytes; j > 0; j -= 2)
+                    for (int j = bytes; j >= 0; j -= 2)
                     {
                         int memadd = Convert.ToInt32(Math.Ceiling(j / 2.0));
                         membytes.Add(memory[modaddr + memadd]);
@@ -166,7 +166,7 @@ namespace SIC_Debug
                         memval -= (uint)extab[symbol] & mask;
                     }
                     byte[] result = BitConverter.GetBytes(memval);
-                    for (int j = bytes; j > 0; j -= 2)
+                    for (int j = bytes; j >= 0; j -= 2)
                     {
                         int memadd = Convert.ToInt32(Math.Ceiling(j / 2.0));
                         memory[modaddr + memadd] = result[Convert.ToInt32(Math.Ceiling(bytes / 2.0)) - memadd];
@@ -576,7 +576,8 @@ namespace SIC_Debug
                         break;
                     case OpCode.LDCH:
                         byte[] regA = BitConverter.GetBytes(RegisterA);
-                        byte[] newVal = { memory[calcaddr], regA[1], regA[2], regA[3] };
+                        byte[] memChar = BitConverter.GetBytes(memval);
+                        byte[] newVal = { memChar[2], regA[1], regA[2], regA[3] };
                         RegisterA = BitConverter.ToInt32(newVal, 0);
                         break;
                     case OpCode.STCH:
