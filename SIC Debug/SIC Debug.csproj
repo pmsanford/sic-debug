@@ -59,7 +59,7 @@
     <Compile Include="Config.Designer.cs">
       <DependentUpon>Config.cs</DependentUpon>
     </Compile>
-    <Compile Include="Device.cs" />
+    <Compile Include="IDevice.cs" />
     <Compile Include="Highlight.cs" />
     <Compile Include="MemoryByteProvider.cs" />
     <Compile Include="SICEvent.cs" />

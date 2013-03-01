@@ -13,25 +13,13 @@ namespace SIC_Debug
     public partial class Config : Form
     {
         SimpleFileDevice[] devices;
+        IDevice[] outDevices;
         TextBox[] tbs;
-        public Config(ref Device[] devices)
+        public Config(ref IDevice[] devices)
         {
             InitializeComponent();
-            this.devices = (SimpleFileDevice[])devices;
-            if ((devices[0] is SimpleFileDevice) && ((SimpleFileDevice)devices[0]).fs != null)
-                tbFile00.Text = ((SimpleFileDevice)devices[6]).fs.Name;
-            if ((devices[1] is SimpleFileDevice) && ((SimpleFileDevice)devices[1]).fs != null)
-                tbFileF1.Text = ((SimpleFileDevice)devices[6]).fs.Name;
-            if ((devices[2] is SimpleFileDevice) && ((SimpleFileDevice)devices[2]).fs != null)
-                tbFileF2.Text = ((SimpleFileDevice)devices[6]).fs.Name;
-            if ((devices[3] is SimpleFileDevice) && ((SimpleFileDevice)devices[3]).fs != null)
-                tbFileF3.Text = ((SimpleFileDevice)devices[6]).fs.Name;
-            if ((devices[4] is SimpleFileDevice) && ((SimpleFileDevice)devices[4]).fs != null)
-                tbFile04.Text = ((SimpleFileDevice)devices[6]).fs.Name;
-            if ((devices[5] is SimpleFileDevice) && ((SimpleFileDevice)devices[5]).fs != null)
-                tbFile05.Text = ((SimpleFileDevice)devices[6]).fs.Name;
-            if ((devices[6] is SimpleFileDevice) && ((SimpleFileDevice)devices[6]).fs != null)
-                tbFile06.Text = ((SimpleFileDevice)devices[6]).fs.Name;
+            this.devices = new SimpleFileDevice[devices.Length];
+            this.outDevices = devices;
             tbs = new TextBox[7];
             tbs[0] = tbFile00;
             tbs[1] = tbFileF1;
@@ -40,6 +28,21 @@ namespace SIC_Debug
             tbs[4] = tbFile04;
             tbs[5] = tbFile05;
             tbs[6] = tbFile06;
+
+            for (int i = 0; i < 7; i++)
+            {
+                if (devices[i] is SimpleFileDevice)
+                {
+                    if (((SimpleFileDevice)devices[i]).fs != null)
+                        tbs[i].Text = ((SimpleFileDevice)devices[i]).fs.Name;
+                    this.devices[i] = (SimpleFileDevice)devices[i];
+                }
+                else
+                {
+                    this.devices[i] = null;
+                    tbs[i].Text = "Not a file device.";
+                }
+            }
         }
 
         public void UpdateBoxes()
@@ -62,19 +65,22 @@ namespace SIC_Debug
         {
             for (int i = 0; i < tbs.Length; i++)
             {
-                if (devices[i].fs != null)
-                    devices[i].fs.Close();
-                devices[i].fs = null;
+                if (devices[i] != null)
+                {
+                    if (((SimpleFileDevice)outDevices[i]).fs != null)
+                        ((SimpleFileDevice)outDevices[i]).fs.Close();
+                    ((SimpleFileDevice)outDevices[i]).fs = null;
+                }
             }
             for (int i = 0; i < tbs.Length; i++)
             {
-                if (tbs[i].Text != "")
+                if (tbs[i].Text != "" && tbs[i].Text != "Not a file device.")
                 {
                     try
                     {
-                        devices[i].fs = new FileStream(tbs[i].Text, FileMode.OpenOrCreate);
+                        outDevices[i] = new SimpleFileDevice(tbs[i].Text);
                     }
-                    catch (Exception)
+                    catch (Exception ex)
                     {
                         string fileid;
                         if (i == 1 || i == 2 || i == 3)
@@ -82,6 +88,7 @@ namespace SIC_Debug
                         else
                             fileid = "0" + (i + 2).ToString();
                         MessageBox.Show("Error opening file " + fileid + ". If you don't want a file open, leave it blank");
+                        string a =ex.Message;
                         return;
                     }
                 }

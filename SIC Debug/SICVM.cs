@@ -23,12 +23,12 @@ namespace SIC_Debug
         public int ProgramCounter { get; set; }
         public int StatusWord { get; set; }
         public bool AllowWriting { get; set; }
-        public Device[] Devices { get { return devices; } }
+        public IDevice[] Devices { get { return devices; } }
         public byte[] Memory { get { return memory; } }
         public bool DeviceWritten { get { return devicewrite; } }
 
         private byte[] memory;
-        public Device[] devices; //TODO: This should be private.
+        public IDevice[] devices; //TODO: This should be private.
         private bool devicewrite;
         public Instruction lastInstruction = null;
         private Instruction current = null;
@@ -50,10 +50,10 @@ namespace SIC_Debug
             RegisterA = RegisterB = RegisterX = RegisterS = RegisterL = RegisterT = ProgramCounter = StatusWord = 0;
             AllowWriting = false;
             memory = Enumerable.Repeat<byte>(0xFF, 1048575).ToArray<byte>(); // 1048575 bytes, 1Mb, is the memory range for XE machines.
-            devices = new Device[7];
+            devices = new IDevice[7];
             for (int i = 0; i < devices.Length; i++)
             {
-                devices[i] = new SimpleFileDevice();
+                devices[i] = null;
             }
             PreInstructionHook = null;
             PostInstructionHook = null;
@@ -255,7 +255,7 @@ namespace SIC_Debug
             return -1;
         }
 
-        public Device GetDevice(byte deviceno)
+        public IDevice GetDevice(byte deviceno)
         {
             switch (deviceno)
             {

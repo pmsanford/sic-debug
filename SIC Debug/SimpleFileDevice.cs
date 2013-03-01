@@ -6,12 +6,17 @@ using System.IO;
 
 namespace SIC_Debug
 {
-    public class SimpleFileDevice : Device
+    public class SimpleFileDevice : IDevice
     {
         public FileStream fs = null;
         int failurecount = 0;
 
-        public override byte Read()
+        public SimpleFileDevice(string path)
+        {
+            this.fs = new FileStream(path, FileMode.OpenOrCreate);
+        }
+
+        public byte Read()
         {
             if (fs == null)
                 throw new DeviceNotInitialized();
@@ -27,7 +32,7 @@ namespace SIC_Debug
             }
         }
 
-        public override void Write(byte outbyte)
+        public void Write(byte outbyte)
         {
             if (fs == null)
                 throw new DeviceNotInitialized();
@@ -52,7 +57,7 @@ namespace SIC_Debug
             failurecount = new Random().Next(1, 5);
         }
 
-        public override bool TestDevice()
+        public bool TestDevice()
         {
             if (failurecount == 0)
             {
