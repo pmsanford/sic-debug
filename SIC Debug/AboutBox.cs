@@ -20,7 +20,7 @@ namespace SIC_Debug
         private void lnkEmail_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
             Process myProc = new Process();
-            myProc.StartInfo.FileName = "mailto:melroy@testmail.com";
+            myProc.StartInfo.FileName = "mailto:me@paulsanford.net";
             myProc.Start();
             myProc.Dispose();
         }
