@@ -651,6 +651,11 @@ namespace SIC_Debug
             }
         }
 
+        public void Run(object startingaddr)
+        {
+            this.Run((int)startingaddr);
+        }
+
         public bool Run(int startingaddr)
         {
             this.devicewrite = false;

@@ -8,6 +8,7 @@ using System.Text;
 using System.Windows.Forms;
 using System.IO;
 using System.Collections;
+using System.Threading;
 
 
 namespace SIC_Debug
@@ -234,7 +235,9 @@ namespace SIC_Debug
             string memmsg = "";
             try
             {
-                bool success = vm.Run(Convert.ToInt32(tbRunAddr.Text, 16));
+                Thread runThread = new Thread(vm.Run);
+                runThread.Start(Convert.ToInt32(tbRunAddr.Text, 16));
+                runThread.Join();
             }
             catch (DeviceNotInitialized)
             {
