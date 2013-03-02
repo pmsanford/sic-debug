@@ -135,7 +135,7 @@ namespace SIC_Debug
                 }
                 while (lines[i][0] == 'M')
                 {
-                    int modaddr = Convert.ToInt32(lines[i].Substring(1, 6), 16) + startaddr - 1;
+                    int modaddr = Convert.ToInt32(lines[i].Substring(1, 6), 16) + startaddr;
                     int bytes = Convert.ToInt32(lines[i].Substring(7, 2), 16);
                     uint mask = bytes > 0 ? (uint)15 : 0;
                     for (int j = 1; j < bytes; j++)
@@ -607,7 +607,7 @@ namespace SIC_Debug
                             location -= 4;
                         else
                             location -= 3;
-                        throw new ArgumentException(string.Format("Error: Instruction at 0x{0} not a recognized opcode.", !current.extended ? ProgramCounter.ToString("X3") : ProgramCounter.ToString("X4")));
+                        throw new ArgumentException(string.Format("Error: Instruction at 0x{0} not a recognized opcode.", !current.extended ? location.ToString("X3") : location.ToString("X4")));
                 }
             }
             catch (IndexOutOfRangeException ex)

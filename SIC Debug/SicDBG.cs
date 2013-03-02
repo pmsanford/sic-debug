@@ -31,6 +31,14 @@ namespace SIC_Debug
 
         int prevInstructionIndex = -1;
 
+        delegate void changeColorCallback(int startAddress, int length, Color foreColor, Color backColor);
+        delegate void resetColorCallback(int startAddress);
+
+        delegate void breakptHandlerCallback(SICEvent e);
+        delegate void traceHandlerCallback(SICEvent e);
+        delegate void stopOnFFCallback(SICEvent e);
+        delegate void memoryChangeCallback(int address, int length);
+
         public SicDBG()
         {
             InitializeComponent();
@@ -145,6 +153,12 @@ namespace SIC_Debug
 
         private void breakptHandler(SICEvent e)
         {
+            if (InvokeRequired)
+            {
+                breakptHandlerCallback c = new breakptHandlerCallback(breakptHandler);
+                Invoke(c, e);
+                return;
+            }
             if (Breakpoints.Contains(e.PC) && (lastBP != e.PC))
             {
                 e.Continue = false;
@@ -164,44 +178,103 @@ namespace SIC_Debug
 
         private void traceHandler(SICEvent e)
         {
-            trace.Enqueue(e.instruction);
+            if (InvokeRequired)
+            {
+                traceHandlerCallback c = new traceHandlerCallback(traceHandler);
+                Invoke(c, e);
+                return;
+            }
+            else
+            {
+                trace.Enqueue(e.instruction);
+            }
         }
 
         private void stopOnFF(SICEvent e)
         {
-            if (vm.Memory[e.PC] == 0xFF)
-                e.Continue = false;
+            if (InvokeRequired)
+            {
+                stopOnFFCallback c = new stopOnFFCallback(stopOnFF);
+                Invoke(c, e);
+                return;
+            }
+            else
+            {
+                if (vm.Memory[e.PC] == 0xFF)
+                {
+                    e.Continue = false;
+                    StringBuilder builder = new StringBuilder();
+                    foreach (string msg in messages)
+                        builder.AppendLine(msg);
+
+                    messages.Clear();
+
+                    OutputMemdump(builder.ToString());
+
+                    foreach (Instruction instruction in trace)
+                    {
+                        lstInstructions.Items.Add(instruction);
+                    }
+                    lstInstructions.SelectedIndex = lstInstructions.Items.Count - 1;
+                    SetRegisters();
+                    hbMemory.Refresh();
+                }
+            }
         }
 
         private void memoryChange(int address, int length)
         {
-            if (lastMemoryHighlight >= 0 && activeHighlights.Keys.Contains((int)lastMemoryHighlight))
-                resetColor((int)lastMemoryHighlight);
-            lastMemoryHighlight = address;
-            changeColor(address, length, Color.Red);
-            hbMemory.Refresh();
+            if (InvokeRequired)
+            {
+                memoryChangeCallback c = new memoryChangeCallback(memoryChange);
+                Invoke(c, address, length);
+                return;
+            }
+            else
+            {
+                if (lastMemoryHighlight >= 0 && activeHighlights.Keys.Contains((int)lastMemoryHighlight))
+                    resetColor((int)lastMemoryHighlight);
+                lastMemoryHighlight = address;
+                changeColor(address, length, Color.Red);
+            }
         }
 
         private void changeColor(int startAddress, int length, Color foreColor)
         {
-            changeColor(startAddress, length, foreColor, Color.White);
+            if (this.hbMemory.InvokeRequired)
+            {
+                changeColorCallback c = new changeColorCallback(changeColor);
+                this.Invoke(c, new object[] { startAddress, length, foreColor, Color.White });
+            }
+            else
+            {
+                changeColor(startAddress, length, foreColor, Color.White);
+            }
         }
 
         private void changeColor(int startAddress, int length, Color foreColor, Color backColor)
         {
-            Highlight newhl = new Highlight(startAddress, length, foreColor, backColor);
-
-            if (activeHighlights.Keys.Contains(startAddress))
+            if (this.hbMemory.InvokeRequired)
             {
-                pushColor(activeHighlights[startAddress]);
-                hbMemory.RemoveHighlight(startAddress);
-                hbMemory.Invalidate();
+                changeColorCallback c = new changeColorCallback(changeColor);
+                this.Invoke(c, new object[] { startAddress, length, foreColor, backColor });
             }
+            else
+            {
+                Highlight newhl = new Highlight(startAddress, length, foreColor, backColor);
 
-            hbMemory.AddHighlight(startAddress, length, foreColor, backColor);
-            activeHighlights.Add(startAddress, newhl);
+                if (activeHighlights.Keys.Contains(startAddress))
+                {
+                    pushColor(activeHighlights[startAddress]);
+                    hbMemory.RemoveHighlight(startAddress);
+                    hbMemory.Invalidate();
+                }
 
-            hbMemory.Refresh();
+                hbMemory.AddHighlight(startAddress, length, foreColor, backColor);
+                activeHighlights.Add(startAddress, newhl);
+
+                hbMemory.Refresh();
+            }
         }
 
         private void pushColor(Highlight highlight)
@@ -215,19 +288,27 @@ namespace SIC_Debug
 
         private void resetColor(int startAddress)
         {
-            hbMemory.RemoveHighlight(startAddress);
-            activeHighlights.Remove(startAddress);
-
-            if (oldHighlights.Keys.Contains(startAddress))
+            if (this.hbMemory.InvokeRequired)
             {
-                Highlight oldhl = oldHighlights[startAddress].Pop();
-                if (oldHighlights[startAddress].Count == 0)
-                    oldHighlights.Remove(startAddress);
-                hbMemory.AddHighlight(oldhl.Address, oldhl.Length, oldhl.ForeColor, oldhl.BackColor);
-                activeHighlights.Add(startAddress, oldhl);
+                resetColorCallback c = new resetColorCallback(resetColor);
+                this.Invoke(c, new object[] { startAddress });
             }
+            else
+            {
+                hbMemory.RemoveHighlight(startAddress);
+                activeHighlights.Remove(startAddress);
 
-            hbMemory.Refresh();
+                if (oldHighlights.Keys.Contains(startAddress))
+                {
+                    Highlight oldhl = oldHighlights[startAddress].Pop();
+                    if (oldHighlights[startAddress].Count == 0)
+                        oldHighlights.Remove(startAddress);
+                    hbMemory.AddHighlight(oldhl.Address, oldhl.Length, oldhl.ForeColor, oldhl.BackColor);
+                    activeHighlights.Add(startAddress, oldhl);
+                }
+
+                hbMemory.Refresh();
+            }
         }
 
         private void btnRun_Click(object sender, EventArgs e)
@@ -237,7 +318,6 @@ namespace SIC_Debug
             {
                 Thread runThread = new Thread(vm.Run);
                 runThread.Start(Convert.ToInt32(tbRunAddr.Text, 16));
-                runThread.Join();
             }
             catch (DeviceNotInitialized)
             {
@@ -255,22 +335,6 @@ namespace SIC_Debug
             {
                 memmsg = string.Format("Error: {0} - {1}", ex.Message, ex.InnerException != null ? ex.InnerException.Message : "");
             }
-            StringBuilder builder = new StringBuilder();
-            foreach (string msg in messages)
-                builder.AppendLine(msg);
-
-            messages.Clear();
-
-            builder.AppendLine(memmsg);
-
-            OutputMemdump(builder.ToString());
-
-            foreach (Instruction instruction in trace)
-            {
-                lstInstructions.Items.Add(instruction);
-            }
-            lstInstructions.SelectedIndex = lstInstructions.Items.Count - 1;
-            SetRegisters();
         }
 
         private void SetRegisters()
