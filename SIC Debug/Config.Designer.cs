@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Config));
             this.tbFileF2 = new System.Windows.Forms.TextBox();
             this.btnBrowseF2 = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
@@ -194,10 +195,9 @@
             this.label6.AutoSize = true;
             this.label6.Location = new System.Drawing.Point(13, 13);
             this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(343, 26);
+            this.label6.Size = new System.Drawing.Size(370, 39);
             this.label6.TabIndex = 3;
-            this.label6.Text = "To completely simulate the SICSIM program, load the loader program in \r\n DEV00 an" +
-                "d your program in DEVF1 and then run from address 0x000";
+            this.label6.Text = resources.GetString("label6.Text");
             // 
             // btnOK
             // 
