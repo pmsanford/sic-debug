@@ -39,17 +39,26 @@ namespace SIC_Debug
         delegate void stopOnFFCallback(SICEvent e);
         delegate void memoryChangeCallback(int address, int length);
 
+        private bool breaker = false;
+
         public SicDBG()
         {
             InitializeComponent();
             vm = new SICVM();
             vm.PreInstructionHook += new SICVM.PreInstruction(breakptHandler);
-            vm.PostInstructionHook += new SICVM.PostInstruction(traceHandler);
             vm.PreInstructionHook += new SICVM.PreInstruction(stopOnFF);
+            vm.PreInstructionHook += new SICVM.PreInstruction(userBreak);
+            vm.PostInstructionHook += new SICVM.PostInstruction(traceHandler);
+            vm.RunningStartedHook += new SICVM.RunningStarted(disableButtons);
+            vm.RunningFinishedHook += new SICVM.RunningFinished(enableButtons);
+            vm.RunningFinishedHook += new SICVM.RunningFinished(updateDisplay);
             hbMemory.ByteProvider = new MemoryByteProvider(vm.Memory);
             hbMemory.SelectionForeColor = Color.White;
             hbMemory.SelectionBackColor = Color.Blue;
             vm.MemoryChangedHook += new SICVM.MemoryChanged(memoryChange);
+            vm.AllowWriting = true;
+            SimpleCharacterTerminal term = new SimpleCharacterTerminal();
+            vm.devices[6] = term;
         }
 
         private void btnLoad_Click(object sender, EventArgs e)
@@ -151,6 +160,15 @@ namespace SIC_Debug
             }
         }
 
+        private void userBreak(SICEvent e)
+        {
+            if (breaker)
+            {
+                e.Continue = false;
+                breaker = false;
+            }
+        }
+
         private void breakptHandler(SICEvent e)
         {
             if (InvokeRequired)
@@ -186,6 +204,8 @@ namespace SIC_Debug
             }
             else
             {
+                if (trace.Count > 250)
+                    trace.Dequeue();
                 trace.Enqueue(e.instruction);
             }
         }
@@ -203,22 +223,33 @@ namespace SIC_Debug
                 if (vm.Memory[e.PC] == 0xFF)
                 {
                     e.Continue = false;
-                    StringBuilder builder = new StringBuilder();
-                    foreach (string msg in messages)
-                        builder.AppendLine(msg);
-
-                    messages.Clear();
-
-                    OutputMemdump(builder.ToString());
-
-                    foreach (Instruction instruction in trace)
-                    {
-                        lstInstructions.Items.Add(instruction);
-                    }
-                    lstInstructions.SelectedIndex = lstInstructions.Items.Count - 1;
-                    SetRegisters();
-                    hbMemory.Refresh();
                 }
+            }
+        }
+
+        private void updateDisplay()
+        {
+            if (InvokeRequired)
+            {
+                this.Invoke(new Action(() => updateDisplay()));
+            }
+            else
+            {
+                StringBuilder builder = new StringBuilder();
+                foreach (string msg in messages)
+                    builder.AppendLine(msg);
+
+                messages.Clear();
+
+                OutputMemdump(builder.ToString());
+
+                foreach (Instruction instruction in trace)
+                {
+                    lstInstructions.Items.Add(instruction);
+                }
+                lstInstructions.SelectedIndex = lstInstructions.Items.Count - 1;
+                SetRegisters();
+                hbMemory.Refresh();
             }
         }
 
@@ -308,6 +339,38 @@ namespace SIC_Debug
                 }
 
                 hbMemory.Refresh();
+            }
+        }
+
+        private void enableButtons()
+        {
+            if (InvokeRequired)
+            {
+                this.Invoke(new Action(() => enableButtons()));
+            }
+            else
+            {
+                btnRun.Enabled = true;
+                btnLoad.Enabled = true;
+                btnLoadEXT.Enabled = true;
+                btnStep.Enabled = true;
+                openFilesToolStripMenuItem.Enabled = true;
+            }
+        }
+
+        private void disableButtons()
+        {
+            if (InvokeRequired)
+            {
+                this.Invoke(new Action(() => disableButtons()));
+            }
+            else
+            {
+                btnRun.Enabled = false;
+                btnLoad.Enabled = false;
+                btnLoadEXT.Enabled = false;
+                btnStep.Enabled = false;
+                openFilesToolStripMenuItem.Enabled = false;
             }
         }
 
@@ -520,6 +583,11 @@ namespace SIC_Debug
                 default:
                     return 3;
             }
+        }
+
+        private void btnBreak_Click(object sender, EventArgs e)
+        {
+            breaker = true;
         }
     }
 

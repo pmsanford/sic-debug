@@ -18,10 +18,12 @@ namespace SIC_Debug
             this.termWindow = new Terminal();
             this.termBox = this.termWindow.TerminalBox;
             this.termBox.KeyDown += new KeyEventHandler(keyDownHandler);
+            this.termWindow.Show();
         }
 
         public byte Read()
         {
+            this.ShowWindow();
             if (inputQueue.Count == 0)
                 throw new DeviceNotReady();
             Keys readKey = inputQueue.Dequeue();
@@ -30,12 +32,32 @@ namespace SIC_Debug
 
         public void Write(byte outbyte)
         {
-            if (this.termBox.SelectionStart == this.termBox.Text.Length && this.termBox.Lines.Length == 24 && this.termBox.Lines[23].Length == 80)
+            if (this.termBox.InvokeRequired)
             {
-                removeTopLine(this.termBox);
-                termBox.AppendText(Environment.NewLine);
+                this.termBox.Invoke(new Action(() => Write(outbyte)));
             }
-            termBox.AppendText(((char)outbyte).ToString());
+            else
+            {
+                this.ShowWindow();
+                if (this.termBox.SelectionStart == this.termBox.Text.Length && this.termBox.Lines.Length == 24 && this.termBox.Lines[23].Length == 80)
+                {
+                    removeTopLine(this.termBox);
+                    termBox.AppendText(Environment.NewLine);
+                }
+                termBox.AppendText(((char)outbyte).ToString());
+            }
+        }
+
+        private void ShowWindow()
+        {
+            if (this.termBox.InvokeRequired)
+            {
+                this.termBox.Invoke(new Action(() => ShowWindow()));
+            }
+            else
+            {
+                this.termWindow.Show();
+            }
         }
 
         private static void removeTopLine(RichTextBox box)
@@ -50,6 +72,7 @@ namespace SIC_Debug
 
         public bool TestDevice()
         {
+            this.ShowWindow();
             if (inputQueue.Count > 0)
                 return true;
             else
@@ -59,6 +82,7 @@ namespace SIC_Debug
         private void keyDownHandler(object sender, KeyEventArgs e)
         {
             e.Handled = true;
+            e.SuppressKeyPress = true;
             inputQueue.Enqueue(e.KeyCode);
         }
     }

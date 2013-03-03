@@ -28,5 +28,10 @@ namespace SIC_Debug
         {
             this.rtbTerminal.Text = "";
         }
+
+        private void Terminal_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            e.Cancel = true;
+        }
     }
 }

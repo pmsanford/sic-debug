@@ -55,6 +55,7 @@
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.Name = "Terminal";
             this.Text = "Terminal";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Terminal_FormClosing);
             this.Load += new System.EventHandler(this.Terminal_Load);
             this.ResumeLayout(false);
 

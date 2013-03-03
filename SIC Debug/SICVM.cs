@@ -26,6 +26,7 @@ namespace SIC_Debug
         public IDevice[] Devices { get { return devices; } }
         public byte[] Memory { get { return memory; } }
         public bool DeviceWritten { get { return devicewrite; } }
+        public bool Running = false;
 
         private byte[] memory;
         public IDevice[] devices; //TODO: This should be private.
@@ -39,11 +40,15 @@ namespace SIC_Debug
         public delegate void PostInstruction(SICEvent args);
         public delegate void WarningHandler(SICWarning args);
         public delegate void MemoryChanged(int address, int length);
+        public delegate void RunningStarted();
+        public delegate void RunningFinished();
 
         public event PreInstruction PreInstructionHook;
         public event PostInstruction PostInstructionHook;
         public event WarningHandler WarningHook;
         public event MemoryChanged MemoryChangedHook;
+        public event RunningStarted RunningStartedHook;
+        public event RunningFinished RunningFinishedHook;
 
         public SICVM()
         {
@@ -658,6 +663,8 @@ namespace SIC_Debug
 
         public bool Run(int startingaddr)
         {
+            Running = true;
+            RunningStartedHook();
             this.devicewrite = false;
             ProgramCounter = startingaddr;
             int currentaddr = startingaddr;
@@ -668,6 +675,8 @@ namespace SIC_Debug
             {
                 if (!Step())
                 {
+                    RunningFinishedHook();
+                    Running = false;
                     return true;
                 }
             }
