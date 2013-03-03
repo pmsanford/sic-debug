@@ -561,7 +561,7 @@ namespace SIC_Debug
             changeColor(current.addrof, current.length, Color.Black, Color.LightSkyBlue);
             if (current.calculatedaddr != null && !(current.immediate && !current.indirect))
             {
-                changeColor((int)current.calculatedaddr, getLengthOperatedOn(current.opcode), Color.Black, Color.LightGray);
+                    changeColor((int)current.calculatedaddr, getLengthOperatedOn(current.opcode), Color.Black, Color.LightGray);
             }
         }
 
@@ -580,6 +580,8 @@ namespace SIC_Debug
                 case OpCode.JGT:
                 case OpCode.JSUB:
                     return 1;
+                case OpCode.RSUB:
+                    return 0; // Short of storing L for every RSUB there's no way to highlight were it was going. I'm considering it though.
                 default:
                     return 3;
             }

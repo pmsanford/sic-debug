@@ -495,7 +495,7 @@ namespace SIC_Debug
             }
             catch (IndexOutOfRangeException ex)
             {
-                throw new IndexOutOfRangeException(string.Format("Error: Instruction at 0x{0:X3} references memory that's out of range (0x{1:X3}).", ProgramCounter, calcaddr), ex);
+                throw new IndexOutOfRangeException(string.Format("Error: Instruction at 0x{0:X3} references memory that's out of range (0x{1:X3}).", current.addrof, calcaddr), ex);
             }
 
             try
