@@ -142,6 +142,7 @@ namespace SIC_Debug
                 {
                     int modaddr = Convert.ToInt32(lines[i].Substring(1, 6), 16) + startaddr;
                     int bytes = Convert.ToInt32(lines[i].Substring(7, 2), 16);
+
                     uint mask = bytes > 0 ? (uint)15 : 0;
                     for (int j = 1; j < bytes; j++)
                     {
@@ -150,16 +151,19 @@ namespace SIC_Debug
                     }
                     char op = lines[i][9];
                     string symbol = lines[i].Substring(10);
-                    List<byte> membytes = new List<byte>();
-                    for (int j = bytes; j >= 0; j -= 2)
-                    {
-                        int memadd = Convert.ToInt32(Math.Ceiling(j / 2.0));
-                        membytes.Add(memory[modaddr + memadd]);
-                    }
-                    while (membytes.Count < 4)
-                        membytes.Add(0);
 
-                    uint memval = BitConverter.ToUInt32(membytes.ToArray(), 0);
+                    int fbytes = bytes % 2 == 0 ? bytes : bytes + 1;
+                    fbytes /= 2;
+
+                    List<byte> bytelist = new List<byte>();
+                    for (int j = fbytes - 1; j >= 0; j--)
+                    {
+                        bytelist.Add(memory[modaddr + j]);
+                    }
+                    while (bytelist.Count < 4)
+                        bytelist.Add(0);
+
+                    uint memval = BitConverter.ToUInt32(bytelist.ToArray(), 0);
                     if (((memval & mask) + (extab[symbol] & mask) > mask) && op == '+')
                         throw new OverflowException(string.Format("Overflow in add instruction at address {0}.", modaddr));
                     if (op == '+')
@@ -170,11 +174,15 @@ namespace SIC_Debug
                     {
                         memval -= (uint)extab[symbol] & mask;
                     }
-                    byte[] result = BitConverter.GetBytes(memval);
-                    for (int j = bytes; j >= 0; j -= 2)
+
+
+                    List<byte> result = BitConverter.GetBytes(memval).ToList();
+                    result.Reverse();
+                    result = result.Skip(result.Count - fbytes).ToList();
+
+                    for (int j = 0; j < fbytes; j++)
                     {
-                        int memadd = Convert.ToInt32(Math.Ceiling(j / 2.0));
-                        memory[modaddr + memadd] = result[Convert.ToInt32(Math.Ceiling(bytes / 2.0)) - memadd];
+                        memory[modaddr + j] = result[j];
                     }
 
                     i++;
