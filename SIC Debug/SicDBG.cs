@@ -8,6 +8,7 @@ using System.Text;
 using System.Windows.Forms;
 using System.IO;
 using System.Collections;
+using System.Threading;
 
 
 namespace SIC_Debug
@@ -30,17 +31,37 @@ namespace SIC_Debug
 
         int prevInstructionIndex = -1;
 
+        delegate void changeColorCallback(int startAddress, int length, Color foreColor, Color backColor);
+        delegate void resetColorCallback(int startAddress);
+
+        delegate void breakptHandlerCallback(SICEvent e);
+        delegate void traceHandlerCallback(SICEvent e);
+        delegate void stopOnFFCallback(SICEvent e);
+        delegate void memoryChangeCallback(int address, int length);
+
+        private bool breaker = false;
+
+        Thread vmThread = null;
+
         public SicDBG()
         {
             InitializeComponent();
             vm = new SICVM();
             vm.PreInstructionHook += new SICVM.PreInstruction(breakptHandler);
-            vm.PostInstructionHook += new SICVM.PostInstruction(traceHandler);
             vm.PreInstructionHook += new SICVM.PreInstruction(stopOnFF);
+            vm.PreInstructionHook += new SICVM.PreInstruction(userBreak);
+            vm.PostInstructionHook += new SICVM.PostInstruction(traceHandler);
+            vm.RunningStartedHook += new SICVM.RunningStarted(disableButtons);
+            vm.RunningFinishedHook += new SICVM.RunningFinished(enableButtons);
+            vm.RunningFinishedHook += new SICVM.RunningFinished(updateDisplay);
             hbMemory.ByteProvider = new MemoryByteProvider(vm.Memory);
             hbMemory.SelectionForeColor = Color.White;
             hbMemory.SelectionBackColor = Color.Blue;
             vm.MemoryChangedHook += new SICVM.MemoryChanged(memoryChange);
+            vm.AllowWriting = true;
+            SimpleCharacterTerminal term = new SimpleCharacterTerminal();
+            vm.devices[6] = term;
+            vmThread = null;
         }
 
         private void btnLoad_Click(object sender, EventArgs e)
@@ -142,8 +163,23 @@ namespace SIC_Debug
             }
         }
 
+        private void userBreak(SICEvent e)
+        {
+            if (breaker)
+            {
+                e.Continue = false;
+                breaker = false;
+            }
+        }
+
         private void breakptHandler(SICEvent e)
         {
+            if (InvokeRequired)
+            {
+                breakptHandlerCallback c = new breakptHandlerCallback(breakptHandler);
+                Invoke(c, e);
+                return;
+            }
             if (Breakpoints.Contains(e.PC) && (lastBP != e.PC))
             {
                 e.Continue = false;
@@ -163,44 +199,119 @@ namespace SIC_Debug
 
         private void traceHandler(SICEvent e)
         {
-            trace.Enqueue(e.instruction);
+            if (InvokeRequired)
+            {
+                traceHandlerCallback c = new traceHandlerCallback(traceHandler);
+                Invoke(c, e);
+                return;
+            }
+            else
+            {
+                if (trace.Count > 250)
+                    trace.Dequeue();
+                trace.Enqueue(e.instruction);
+            }
         }
 
         private void stopOnFF(SICEvent e)
         {
-            if (vm.Memory[e.PC] == 0xFF)
-                e.Continue = false;
+            if (InvokeRequired)
+            {
+                stopOnFFCallback c = new stopOnFFCallback(stopOnFF);
+                Invoke(c, e);
+                return;
+            }
+            else
+            {
+                if (vm.Memory[e.PC] == 0xFF)
+                {
+                    e.Continue = false;
+                }
+            }
+        }
+
+        private void updateDisplay()
+        {
+            if (InvokeRequired)
+            {
+                this.Invoke(new Action(() => updateDisplay()));
+            }
+            else
+            {
+                StringBuilder builder = new StringBuilder();
+                foreach (string msg in messages)
+                    builder.AppendLine(msg);
+
+                messages.Clear();
+
+                OutputMemdump(builder.ToString());
+
+                lstInstructions.Items.Clear();
+                foreach (Instruction instruction in trace)
+                {
+                    lstInstructions.Items.Add(instruction);
+                }
+                lstInstructions.SelectedIndex = lstInstructions.Items.Count - 1;
+                SetRegisters();
+                hbMemory.Refresh();
+            }
         }
 
         private void memoryChange(int address, int length)
         {
-            if (lastMemoryHighlight >= 0 && activeHighlights.Keys.Contains((int)lastMemoryHighlight))
-                resetColor((int)lastMemoryHighlight);
-            lastMemoryHighlight = address;
-            changeColor(address, length, Color.Red);
-            hbMemory.Refresh();
+            if (vm.Running)
+                return;
+            if (InvokeRequired)
+            {
+                memoryChangeCallback c = new memoryChangeCallback(memoryChange);
+                Invoke(c, address, length);
+                return;
+            }
+            else
+            {
+                if (lastMemoryHighlight >= 0 && activeHighlights.Keys.Contains((int)lastMemoryHighlight))
+                    resetColor((int)lastMemoryHighlight);
+                lastMemoryHighlight = address;
+                changeColor(address, length, Color.Red);
+            }
         }
 
         private void changeColor(int startAddress, int length, Color foreColor)
         {
-            changeColor(startAddress, length, foreColor, Color.White);
+            if (this.hbMemory.InvokeRequired)
+            {
+                changeColorCallback c = new changeColorCallback(changeColor);
+                this.Invoke(c, new object[] { startAddress, length, foreColor, Color.White });
+            }
+            else
+            {
+                changeColor(startAddress, length, foreColor, Color.White);
+            }
         }
 
         private void changeColor(int startAddress, int length, Color foreColor, Color backColor)
         {
-            Highlight newhl = new Highlight(startAddress, length, foreColor, backColor);
-
-            if (activeHighlights.Keys.Contains(startAddress))
+            if (this.hbMemory.InvokeRequired)
             {
-                pushColor(activeHighlights[startAddress]);
-                hbMemory.RemoveHighlight(startAddress);
-                hbMemory.Invalidate();
+                changeColorCallback c = new changeColorCallback(changeColor);
+                this.Invoke(c, new object[] { startAddress, length, foreColor, backColor });
             }
+            else
+            {
+                Highlight newhl = new Highlight(startAddress, length, foreColor, backColor);
 
-            hbMemory.AddHighlight(startAddress, length, foreColor, backColor);
-            activeHighlights.Add(startAddress, newhl);
+                if (activeHighlights.Keys.Contains(startAddress))
+                {
+                    pushColor(activeHighlights[startAddress]);
+                    hbMemory.RemoveHighlight(startAddress);
+                    hbMemory.Invalidate();
+                }
 
-            hbMemory.Refresh();
+                hbMemory.AddHighlight(startAddress, length, foreColor, backColor);
+                activeHighlights.Add(startAddress, newhl);
+
+                hbMemory.Refresh();
+            }
         }
 
         private void pushColor(Highlight highlight)
@@ -214,19 +325,62 @@ namespace SIC_Debug
 
         private void resetColor(int startAddress)
         {
-            hbMemory.RemoveHighlight(startAddress);
-            activeHighlights.Remove(startAddress);
-
-            if (oldHighlights.Keys.Contains(startAddress))
+            if (this.hbMemory.InvokeRequired)
             {
-                Highlight oldhl = oldHighlights[startAddress].Pop();
-                if (oldHighlights[startAddress].Count == 0)
-                    oldHighlights.Remove(startAddress);
-                hbMemory.AddHighlight(oldhl.Address, oldhl.Length, oldhl.ForeColor, oldhl.BackColor);
-                activeHighlights.Add(startAddress, oldhl);
+                resetColorCallback c = new resetColorCallback(resetColor);
+                this.Invoke(c, new object[] { startAddress });
             }
+            else
+            {
+                hbMemory.RemoveHighlight(startAddress);
+                activeHighlights.Remove(startAddress);
 
-            hbMemory.Refresh();
+                if (oldHighlights.Keys.Contains(startAddress))
+                {
+                    Highlight oldhl = oldHighlights[startAddress].Pop();
+                    if (oldHighlights[startAddress].Count == 0)
+                        oldHighlights.Remove(startAddress);
+                    hbMemory.AddHighlight(oldhl.Address, oldhl.Length, oldhl.ForeColor, oldhl.BackColor);
+                    activeHighlights.Add(startAddress, oldhl);
+                }
+
+                hbMemory.Refresh();
+            }
+        }
+
+        private void enableButtons()
+        {
+            if (InvokeRequired)
+            {
+                this.Invoke(new Action(() => enableButtons()));
+            }
+            else
+            {
+                btnRun.Enabled = true;
+                btnLoad.Enabled = true;
+                btnLoadEXT.Enabled = true;
+                btnStep.Enabled = true;
+                openFilesToolStripMenuItem.Enabled = true;
+                btnBreak.Enabled = false;
+                vmThread = null;
+            }
+        }
+
+        private void disableButtons()
+        {
+            if (InvokeRequired)
+            {
+                this.Invoke(new Action(() => disableButtons()));
+            }
+            else
+            {
+                btnRun.Enabled = false;
+                btnLoad.Enabled = false;
+                btnLoadEXT.Enabled = false;
+                btnStep.Enabled = false;
+                openFilesToolStripMenuItem.Enabled = false;
+                btnBreak.Enabled = true;
+            }
         }
 
         private void btnRun_Click(object sender, EventArgs e)
@@ -234,7 +388,8 @@ namespace SIC_Debug
             string memmsg = "";
             try
             {
-                bool success = vm.Run(Convert.ToInt32(tbRunAddr.Text, 16));
+                vmThread = new Thread(vm.Run);
+                vmThread.Start(Convert.ToInt32(tbRunAddr.Text, 16));
             }
             catch (DeviceNotInitialized)
             {
@@ -252,22 +407,6 @@ namespace SIC_Debug
             {
                 memmsg = string.Format("Error: {0} - {1}", ex.Message, ex.InnerException != null ? ex.InnerException.Message : "");
             }
-            StringBuilder builder = new StringBuilder();
-            foreach (string msg in messages)
-                builder.AppendLine(msg);
-
-            messages.Clear();
-
-            builder.AppendLine(memmsg);
-
-            OutputMemdump(builder.ToString());
-
-            foreach (Instruction instruction in trace)
-            {
-                lstInstructions.Items.Add(instruction);
-            }
-            lstInstructions.SelectedIndex = lstInstructions.Items.Count - 1;
-            SetRegisters();
         }
 
         private void SetRegisters()
@@ -431,7 +570,7 @@ namespace SIC_Debug
             changeColor(current.addrof, current.length, Color.Black, Color.LightSkyBlue);
             if (current.calculatedaddr != null && !(current.immediate && !current.indirect))
             {
-                changeColor((int)current.calculatedaddr, getLengthOperatedOn(current.opcode), Color.Black, Color.LightGray);
+                    changeColor((int)current.calculatedaddr, getLengthOperatedOn(current.opcode), Color.Black, Color.LightGray);
             }
         }
 
@@ -450,9 +589,22 @@ namespace SIC_Debug
                 case OpCode.JGT:
                 case OpCode.JSUB:
                     return 1;
+                case OpCode.RSUB:
+                    return 0; // Short of storing L for every RSUB there's no way to highlight were it was going. I'm considering it though.
                 default:
                     return 3;
             }
+        }
+
+        private void btnBreak_Click(object sender, EventArgs e)
+        {
+            breaker = true;
+        }
+
+        private void SicDBG_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (vmThread != null)
+                vmThread.Abort();
         }
     }
 

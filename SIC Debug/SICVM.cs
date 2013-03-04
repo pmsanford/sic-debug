@@ -26,6 +26,7 @@ namespace SIC_Debug
         public IDevice[] Devices { get { return devices; } }
         public byte[] Memory { get { return memory; } }
         public bool DeviceWritten { get { return devicewrite; } }
+        public bool Running = false;
 
         private byte[] memory;
         public IDevice[] devices; //TODO: This should be private.
@@ -39,11 +40,15 @@ namespace SIC_Debug
         public delegate void PostInstruction(SICEvent args);
         public delegate void WarningHandler(SICWarning args);
         public delegate void MemoryChanged(int address, int length);
+        public delegate void RunningStarted();
+        public delegate void RunningFinished();
 
         public event PreInstruction PreInstructionHook;
         public event PostInstruction PostInstructionHook;
         public event WarningHandler WarningHook;
         public event MemoryChanged MemoryChangedHook;
+        public event RunningStarted RunningStartedHook;
+        public event RunningFinished RunningFinishedHook;
 
         public SICVM()
         {
@@ -84,7 +89,7 @@ namespace SIC_Debug
                         startaddr += proglen;
                         string proglenstr = line.Substring(13, 6);
                         proglen = Convert.ToInt32(proglenstr, 16);
-                        extab.Add(line.Substring(1, 6), startaddr);
+                        extab.Add(line.Substring(1, 6).Trim(), startaddr);
                     }
                     if (line[0] == 'D')
                     {
@@ -112,7 +117,7 @@ namespace SIC_Debug
                     throw new FormatException(string.Format("ERROR: Expected 'H' record on line {2}, encountered this instead:{0}{1}{0}",
                         Environment.NewLine, lines[i], i));
                 }
-                startaddr = extab[lines[i].Substring(1, 6)];
+                startaddr = extab[lines[i].Substring(1, 6).Trim()];
                 i++;
                 while (lines[i][0] == 'D')
                 {
@@ -135,8 +140,9 @@ namespace SIC_Debug
                 }
                 while (lines[i][0] == 'M')
                 {
-                    int modaddr = Convert.ToInt32(lines[i].Substring(1, 6), 16) + startaddr - 1;
+                    int modaddr = Convert.ToInt32(lines[i].Substring(1, 6), 16) + startaddr;
                     int bytes = Convert.ToInt32(lines[i].Substring(7, 2), 16);
+
                     uint mask = bytes > 0 ? (uint)15 : 0;
                     for (int j = 1; j < bytes; j++)
                     {
@@ -145,16 +151,19 @@ namespace SIC_Debug
                     }
                     char op = lines[i][9];
                     string symbol = lines[i].Substring(10);
-                    List<byte> membytes = new List<byte>();
-                    for (int j = bytes; j >= 0; j -= 2)
-                    {
-                        int memadd = Convert.ToInt32(Math.Ceiling(j / 2.0));
-                        membytes.Add(memory[modaddr + memadd]);
-                    }
-                    while (membytes.Count < 4)
-                        membytes.Add(0);
 
-                    uint memval = BitConverter.ToUInt32(membytes.ToArray(), 0);
+                    int fbytes = bytes % 2 == 0 ? bytes : bytes + 1;
+                    fbytes /= 2;
+
+                    List<byte> bytelist = new List<byte>();
+                    for (int j = fbytes - 1; j >= 0; j--)
+                    {
+                        bytelist.Add(memory[modaddr + j]);
+                    }
+                    while (bytelist.Count < 4)
+                        bytelist.Add(0);
+
+                    uint memval = BitConverter.ToUInt32(bytelist.ToArray(), 0);
                     if (((memval & mask) + (extab[symbol] & mask) > mask) && op == '+')
                         throw new OverflowException(string.Format("Overflow in add instruction at address {0}.", modaddr));
                     if (op == '+')
@@ -165,11 +174,15 @@ namespace SIC_Debug
                     {
                         memval -= (uint)extab[symbol] & mask;
                     }
-                    byte[] result = BitConverter.GetBytes(memval);
-                    for (int j = bytes; j >= 0; j -= 2)
+
+
+                    List<byte> result = BitConverter.GetBytes(memval).ToList();
+                    result.Reverse();
+                    result = result.Skip(result.Count - fbytes).ToList();
+
+                    for (int j = 0; j < fbytes; j++)
                     {
-                        int memadd = Convert.ToInt32(Math.Ceiling(j / 2.0));
-                        memory[modaddr + memadd] = result[Convert.ToInt32(Math.Ceiling(bytes / 2.0)) - memadd];
+                        memory[modaddr + j] = result[j];
                     }
 
                     i++;
@@ -490,7 +503,7 @@ namespace SIC_Debug
             }
             catch (IndexOutOfRangeException ex)
             {
-                throw new IndexOutOfRangeException(string.Format("Error: Instruction at 0x{0:X3} references memory that's out of range (0x{1:X3}).", ProgramCounter, calcaddr), ex);
+                throw new IndexOutOfRangeException(string.Format("Error: Instruction at 0x{0:X3} references memory that's out of range (0x{1:X3}).", current.addrof, calcaddr), ex);
             }
 
             try
@@ -607,7 +620,7 @@ namespace SIC_Debug
                             location -= 4;
                         else
                             location -= 3;
-                        throw new ArgumentException(string.Format("Error: Instruction at 0x{0} not a recognized opcode.", !current.extended ? ProgramCounter.ToString("X3") : ProgramCounter.ToString("X4")));
+                        throw new ArgumentException(string.Format("Error: Instruction at 0x{0} not a recognized opcode.", !current.extended ? location.ToString("X3") : location.ToString("X4")));
                 }
             }
             catch (IndexOutOfRangeException ex)
@@ -651,8 +664,15 @@ namespace SIC_Debug
             }
         }
 
+        public void Run(object startingaddr)
+        {
+            this.Run((int)startingaddr);
+        }
+
         public bool Run(int startingaddr)
         {
+            Running = true;
+            RunningStartedHook();
             this.devicewrite = false;
             ProgramCounter = startingaddr;
             int currentaddr = startingaddr;
@@ -663,6 +683,8 @@ namespace SIC_Debug
             {
                 if (!Step())
                 {
+                    RunningFinishedHook();
+                    Running = false;
                     return true;
                 }
             }

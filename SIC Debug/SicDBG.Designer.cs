@@ -66,6 +66,7 @@
             this.label11 = new System.Windows.Forms.Label();
             this.label12 = new System.Windows.Forms.Label();
             this.hbMemory = new Be.Windows.Forms.HexBox();
+            this.btnBreak = new System.Windows.Forms.Button();
             this.mnuMain.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -95,7 +96,7 @@
             // btnBkPt
             // 
             this.btnBkPt.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnBkPt.Location = new System.Drawing.Point(597, 217);
+            this.btnBkPt.Location = new System.Drawing.Point(597, 214);
             this.btnBkPt.Name = "btnBkPt";
             this.btnBkPt.Size = new System.Drawing.Size(75, 23);
             this.btnBkPt.TabIndex = 4;
@@ -116,9 +117,9 @@
             this.lstBkpt.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.lstBkpt.FormattingEnabled = true;
-            this.lstBkpt.Location = new System.Drawing.Point(597, 246);
+            this.lstBkpt.Location = new System.Drawing.Point(597, 272);
             this.lstBkpt.Name = "lstBkpt";
-            this.lstBkpt.Size = new System.Drawing.Size(75, 238);
+            this.lstBkpt.Size = new System.Drawing.Size(75, 212);
             this.lstBkpt.TabIndex = 6;
             // 
             // btnDelPt
@@ -187,7 +188,7 @@
             // openFilesToolStripMenuItem
             // 
             this.openFilesToolStripMenuItem.Name = "openFilesToolStripMenuItem";
-            this.openFilesToolStripMenuItem.Size = new System.Drawing.Size(149, 22);
+            this.openFilesToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.openFilesToolStripMenuItem.Text = "Open Files";
             this.openFilesToolStripMenuItem.Click += new System.EventHandler(this.openFilesToolStripMenuItem_Click);
             // 
@@ -196,19 +197,19 @@
             this.allowWritingToolStripMenuItem.Checked = true;
             this.allowWritingToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
             this.allowWritingToolStripMenuItem.Name = "allowWritingToolStripMenuItem";
-            this.allowWritingToolStripMenuItem.Size = new System.Drawing.Size(149, 22);
+            this.allowWritingToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.allowWritingToolStripMenuItem.Text = "Allow Writing";
             this.allowWritingToolStripMenuItem.Click += new System.EventHandler(this.allowWritingToolStripMenuItem_Click);
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(146, 6);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(149, 6);
             // 
             // clearMemoryToolStripMenuItem
             // 
             this.clearMemoryToolStripMenuItem.Name = "clearMemoryToolStripMenuItem";
-            this.clearMemoryToolStripMenuItem.Size = new System.Drawing.Size(149, 22);
+            this.clearMemoryToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.clearMemoryToolStripMenuItem.Text = "Clear Memory";
             this.clearMemoryToolStripMenuItem.Click += new System.EventHandler(this.clearMemoryToolStripMenuItem_Click);
             // 
@@ -436,6 +437,18 @@
             this.hbMemory.UseFixedBytesPerLine = true;
             this.hbMemory.VScrollBarVisible = true;
             // 
+            // btnBreak
+            // 
+            this.btnBreak.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnBreak.Enabled = false;
+            this.btnBreak.Location = new System.Drawing.Point(597, 243);
+            this.btnBreak.Name = "btnBreak";
+            this.btnBreak.Size = new System.Drawing.Size(75, 23);
+            this.btnBreak.TabIndex = 4;
+            this.btnBreak.Text = "Break";
+            this.btnBreak.UseVisualStyleBackColor = true;
+            this.btnBreak.Click += new System.EventHandler(this.btnBreak_Click);
+            // 
             // SicDBG
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -468,6 +481,7 @@
             this.Controls.Add(this.btnDelPt);
             this.Controls.Add(this.lstBkpt);
             this.Controls.Add(this.tbBkPt);
+            this.Controls.Add(this.btnBreak);
             this.Controls.Add(this.btnBkPt);
             this.Controls.Add(this.btnLoadEXT);
             this.Controls.Add(this.btnLoad);
@@ -477,6 +491,7 @@
             this.MinimumSize = new System.Drawing.Size(722, 426);
             this.Name = "SicDBG";
             this.Text = "SIC Debug";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.SicDBG_FormClosing);
             this.mnuMain.ResumeLayout(false);
             this.mnuMain.PerformLayout();
             this.ResumeLayout(false);
@@ -524,6 +539,7 @@
         private System.Windows.Forms.Label label11;
         private System.Windows.Forms.Label label12;
         private Be.Windows.Forms.HexBox hbMemory;
+        private System.Windows.Forms.Button btnBreak;
     }
 }
 
