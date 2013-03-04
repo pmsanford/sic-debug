@@ -41,6 +41,8 @@ namespace SIC_Debug
 
         private bool breaker = false;
 
+        Thread vmThread;
+
         public SicDBG()
         {
             InitializeComponent();
@@ -59,6 +61,7 @@ namespace SIC_Debug
             vm.AllowWriting = true;
             SimpleCharacterTerminal term = new SimpleCharacterTerminal();
             vm.devices[6] = term;
+            vmThread = null;
         }
 
         private void btnLoad_Click(object sender, EventArgs e)
@@ -243,6 +246,7 @@ namespace SIC_Debug
 
                 OutputMemdump(builder.ToString());
 
+                lstInstructions.Items.Clear();
                 foreach (Instruction instruction in trace)
                 {
                     lstInstructions.Items.Add(instruction);
@@ -255,6 +259,8 @@ namespace SIC_Debug
 
         private void memoryChange(int address, int length)
         {
+            if (vm.Running)
+                return;
             if (InvokeRequired)
             {
                 memoryChangeCallback c = new memoryChangeCallback(memoryChange);
@@ -379,8 +385,8 @@ namespace SIC_Debug
             string memmsg = "";
             try
             {
-                Thread runThread = new Thread(vm.Run);
-                runThread.Start(Convert.ToInt32(tbRunAddr.Text, 16));
+                vmThread = new Thread(vm.Run);
+                vmThread.Start(Convert.ToInt32(tbRunAddr.Text, 16));
             }
             catch (DeviceNotInitialized)
             {
@@ -590,6 +596,11 @@ namespace SIC_Debug
         private void btnBreak_Click(object sender, EventArgs e)
         {
             breaker = true;
+        }
+
+        private void SicDBG_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            vmThread.Abort();
         }
     }
 

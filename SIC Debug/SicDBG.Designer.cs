@@ -490,6 +490,7 @@
             this.MinimumSize = new System.Drawing.Size(722, 426);
             this.Name = "SicDBG";
             this.Text = "SIC Debug";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.SicDBG_FormClosing);
             this.mnuMain.ResumeLayout(false);
             this.mnuMain.PerformLayout();
             this.ResumeLayout(false);

@@ -39,6 +39,11 @@ namespace SIC_Debug
             else
             {
                 this.ShowWindow();
+                if (outbyte == 0x08)
+                {
+                    handleBackspace();
+                    return;
+                }
                 if (this.termBox.SelectionStart == this.termBox.Text.Length && this.termBox.Lines.Length == 24 && this.termBox.Lines[23].Length == 80)
                 {
                     removeTopLine(this.termBox);
@@ -46,6 +51,14 @@ namespace SIC_Debug
                 }
                 termBox.AppendText(((char)outbyte).ToString());
             }
+        }
+
+        private void handleBackspace()
+        {
+            termBox.SelectionStart = termBox.Text.Length - 1;
+            termBox.SelectionLength = 1;
+            termBox.SelectedText = "";
+            termBox.SelectionStart = termBox.Text.Length;
         }
 
         private void ShowWindow()

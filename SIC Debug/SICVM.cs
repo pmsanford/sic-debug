@@ -89,7 +89,7 @@ namespace SIC_Debug
                         startaddr += proglen;
                         string proglenstr = line.Substring(13, 6);
                         proglen = Convert.ToInt32(proglenstr, 16);
-                        extab.Add(line.Substring(1, 6), startaddr);
+                        extab.Add(line.Substring(1, 6).Trim(), startaddr);
                     }
                     if (line[0] == 'D')
                     {
@@ -117,7 +117,7 @@ namespace SIC_Debug
                     throw new FormatException(string.Format("ERROR: Expected 'H' record on line {2}, encountered this instead:{0}{1}{0}",
                         Environment.NewLine, lines[i], i));
                 }
-                startaddr = extab[lines[i].Substring(1, 6)];
+                startaddr = extab[lines[i].Substring(1, 6).Trim()];
                 i++;
                 while (lines[i][0] == 'D')
                 {
