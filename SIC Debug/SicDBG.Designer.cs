@@ -96,7 +96,7 @@
             // btnBkPt
             // 
             this.btnBkPt.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnBkPt.Location = new System.Drawing.Point(597, 243);
+            this.btnBkPt.Location = new System.Drawing.Point(597, 214);
             this.btnBkPt.Name = "btnBkPt";
             this.btnBkPt.Size = new System.Drawing.Size(75, 23);
             this.btnBkPt.TabIndex = 4;
@@ -440,7 +440,8 @@
             // btnBreak
             // 
             this.btnBreak.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnBreak.Location = new System.Drawing.Point(597, 217);
+            this.btnBreak.Enabled = false;
+            this.btnBreak.Location = new System.Drawing.Point(597, 243);
             this.btnBreak.Name = "btnBreak";
             this.btnBreak.Size = new System.Drawing.Size(75, 23);
             this.btnBreak.TabIndex = 4;

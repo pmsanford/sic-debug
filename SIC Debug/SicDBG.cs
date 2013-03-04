@@ -41,7 +41,7 @@ namespace SIC_Debug
 
         private bool breaker = false;
 
-        Thread vmThread;
+        Thread vmThread = null;
 
         public SicDBG()
         {
@@ -361,6 +361,8 @@ namespace SIC_Debug
                 btnLoadEXT.Enabled = true;
                 btnStep.Enabled = true;
                 openFilesToolStripMenuItem.Enabled = true;
+                btnBreak.Enabled = false;
+                vmThread = null;
             }
         }
 
@@ -377,6 +379,7 @@ namespace SIC_Debug
                 btnLoadEXT.Enabled = false;
                 btnStep.Enabled = false;
                 openFilesToolStripMenuItem.Enabled = false;
+                btnBreak.Enabled = true;
             }
         }
 
@@ -600,7 +603,8 @@ namespace SIC_Debug
 
         private void SicDBG_FormClosing(object sender, FormClosingEventArgs e)
         {
-            vmThread.Abort();
+            if (vmThread != null)
+                vmThread.Abort();
         }
     }
 
