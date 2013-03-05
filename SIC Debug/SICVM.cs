@@ -15,12 +15,102 @@ namespace SIC_Debug
         }
 
         //TODO: "Each register is 24 bits in length" Beck p5
-        public int RegisterA { get; set; }
-        public int RegisterB { get; set; }
-        public int RegisterX { get; set; }
-        public int RegisterS { get; set; }
-        public int RegisterL { get; set; }
-        public int RegisterT { get; set; }
+        public int RegisterA
+        {
+            get
+            {
+                return registerA;
+            }
+            set
+            {
+                if ((value & 0x800000) > 1)
+                {
+                    registerA = unchecked((int)((value & 0xFFFFFF) + 0xFF000000));
+                }
+                else
+                    registerA = value;
+            }
+        }
+        public int RegisterB
+        {
+            get
+            {
+                return registerB;
+            }
+            set
+            {
+                if ((value & 0x800000) > 1)
+                {
+                    registerB = unchecked((int)((value & 0xFFFFFF) + 0xFF000000));
+                }
+                else
+                    registerB = value;
+            }
+        }
+        public int RegisterX
+        {
+            get
+            {
+                return registerX;
+            }
+            set
+            {
+                if ((value & 0x800000) > 1)
+                {
+                    registerX = unchecked((int)((value & 0xFFFFFF) + 0xFF000000));
+                }
+                else
+                    registerX = value;
+            }
+        }
+        public int RegisterS
+        {
+            get
+            {
+                return registerS;
+            }
+            set
+            {
+                if ((value & 0x800000) > 1)
+                {
+                    registerS = unchecked((int)((value & 0xFFFFFF) + 0xFF000000));
+                }
+                else
+                    registerS = value;
+            }
+        }
+        public int RegisterL
+        {
+            get
+            {
+                return registerL;
+            }
+            set
+            {
+                if ((value & 0x800000) > 1)
+                {
+                    registerL = unchecked((int)((value & 0xFFFFFF) + 0xFF000000));
+                }
+                else
+                    registerL = value;
+            }
+        }
+        public int RegisterT
+        {
+            get
+            {
+                return registerT;
+            }
+            set
+            {
+                if ((value & 0x800000) > 1)
+                {
+                    registerT = unchecked((int)((value & 0xFFFFFF) + 0xFF000000));
+                }
+                else
+                    registerT = value;
+            }
+        }
         public int ProgramCounter { get; set; }
         public int StatusWord { get; set; }
         public bool AllowWriting { get; set; }
@@ -28,6 +118,8 @@ namespace SIC_Debug
         public byte[] Memory { get { return memory; } }
         public bool DeviceWritten { get { return devicewrite; } }
         public bool Running = false;
+
+        int registerA, registerB, registerX, registerS, registerL, registerT;
 
         private byte[] memory;
         public IDevice[] devices; //TODO: This should be private.
