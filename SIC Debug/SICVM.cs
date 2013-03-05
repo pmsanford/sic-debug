@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 
 namespace SIC_Debug
 {
@@ -41,7 +42,7 @@ namespace SIC_Debug
         public delegate void WarningHandler(SICWarning args);
         public delegate void MemoryChanged(int address, int length);
         public delegate void RunningStarted();
-        public delegate void RunningFinished();
+        public delegate void RunningFinished(SICEvent args);
 
         public event PreInstruction PreInstructionHook;
         public event PostInstruction PostInstructionHook;
@@ -681,11 +682,24 @@ namespace SIC_Debug
 
             while (true)
             {
-                if (!Step())
+                try
                 {
-                    RunningFinishedHook();
+                    if (!Step())
+                    {
+                        RunningFinishedHook(new SICEvent(current, this.ProgramCounter));
+                        Running = false;
+                        return true;
+                    }
+                }
+                catch (ThreadAbortException)
+                {
+                    return false;
+                }
+                catch (Exception ex)
+                {
+                    RunningFinishedHook(new SICEvent(current, this.ProgramCounter, ex, string.Format("Error encountered at location {0:X6}: {1}", this.ProgramCounter, ex.Message)));
                     Running = false;
-                    return true;
+                    return false;
                 }
             }
         }

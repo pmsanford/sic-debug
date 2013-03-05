@@ -230,15 +230,19 @@ namespace SIC_Debug
             }
         }
 
-        private void updateDisplay()
+        private void updateDisplay(SICEvent args)
         {
             if (InvokeRequired)
             {
-                this.Invoke(new Action(() => updateDisplay()));
+                this.Invoke(new Action(() => updateDisplay(args)));
             }
             else
             {
                 StringBuilder builder = new StringBuilder();
+
+                if (args.Message != null)
+                    messages.Enqueue(args.Message);
+
                 foreach (string msg in messages)
                     builder.AppendLine(msg);
 
@@ -348,11 +352,11 @@ namespace SIC_Debug
             }
         }
 
-        private void enableButtons()
+        private void enableButtons(SICEvent args)
         {
             if (InvokeRequired)
             {
-                this.Invoke(new Action(() => enableButtons()));
+                this.Invoke(new Action(() => enableButtons(args)));
             }
             else
             {
@@ -604,7 +608,9 @@ namespace SIC_Debug
         private void SicDBG_FormClosing(object sender, FormClosingEventArgs e)
         {
             if (vmThread != null)
+            {
                 vmThread.Abort();
+            }
         }
     }
 
