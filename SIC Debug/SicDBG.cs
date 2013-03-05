@@ -85,12 +85,6 @@ namespace SIC_Debug
 
                 Tuple<int, int> addresses = vm.LoadObjectFile(infilestr);
 
-                int endaddr = addresses.Item2;
-                if (addresses.Item2 - addresses.Item1 > 0x130)
-                {
-                    tbOutput.Text += string.Format("Loaded code covers more than 20 lines, showing first 20. You can show more above.{0}", Environment.NewLine);
-                    endaddr = addresses.Item1 + 0x130;
-                }
                 tbRunAddr.Text = string.Format("{0:X}", addresses.Item1);
 
                 OutputMemdump();
@@ -531,12 +525,6 @@ namespace SIC_Debug
 
                 Tuple<int, int> addresses = vm.LoadXEObjectFile(infilestr);
 
-                int endaddr = addresses.Item2;
-                if (addresses.Item2 - addresses.Item1 > 0x130)
-                {
-                    tbOutput.Text += string.Format("Loaded code covers more than 20 lines, showing first 20. You can show more above.{0}", Environment.NewLine);
-                    endaddr = addresses.Item1 + 0x130;
-                }
                 tbRunAddr.Text = string.Format("{0:X}", addresses.Item1);
 
                 OutputMemdump();
