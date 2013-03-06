@@ -473,8 +473,20 @@ namespace SIC_Debug
 
             if (current.immediate && !current.indirect)
             {
-                if (!current.pcrel) // Immediate mode combined with an addressing mode gets you the address as data. See Beck, p61
+                if (!current.pcrel)
+                { // Immediate mode combined with an addressing mode gets you the address as data. See Beck, p61
                     memval = current.address;
+                    if (current.extended)
+                    {
+                        if ((memval & 0x80000) > 0)
+                            memval = unchecked((int)((memval & 0xFFFFF) + 0xFFF00000));
+                    }
+                    else
+                    {
+                        if ((memval & 0x800) > 0)
+                            memval = unchecked((int)((memval & 0xFFF) + 0xFFFFF000));
+                    }
+                }
                 else if (current.baserel)
                     memval = RegisterB + current.address;
                 else
